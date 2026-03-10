@@ -35,425 +35,104 @@ A JavaFX desktop application that simulates Robert Axelrod's famous tournaments 
 # 2. Domain Model
 
 ## 2.1 Action Enum
-
-```java
-public enum Action {
-    COOPERATE,
-    DEFECT
-}
-```
+- **COOPERATE**: Player chooses to cooperate
+- **DEFECT**: Player chooses to defect
 
 ## 2.2 Strategy Interface
-
-All strategies implement this interface:
-
-```java
-public interface Strategy {
-    String getName();
-    Action nextMove(GameHistory history);
-    default void reset() { }
-}
-```
-
-Key design decisions:
+Every strategy implements this interface:
 - `getName()`: Display name for UI
-- `nextMove()`: Core decision logic, receives full history
-- `reset()`: Optional reset between matches in a tournament
+- `nextMove(GameHistory history)`: Core decision logic, receives full game history
+- `reset()`: Optional method to reset state between matches
 
 ## 2.3 GameHistory Class
-
-Provides access to the game history for decision-making:
-
-```java
-public class GameHistory {
-    private List<Action> myMoves;
-    private List<Action> opponentMoves;
-    private int roundNumber;
-
-    public boolean isFirstMove();
-    public Action getMyLastMove();
-    public Action getOpponentLastMove();
-    public List<Action> getMyMoves();
-    public List<Action> getOpponentMoves();
-    public int getTotalRounds();
-    
-    public void recordMove(Action myMove, Action opponentMove);
-}
-```
+Provides access to game history for decision-making:
+- `isFirstMove()`: Check if this is the first round
+- `getMyLastMove()` / `getOpponentLastMove()`: Get most recent moves
+- `getMyMoves()` / `getOpponentMoves()`: Get all moves
+- `getTotalRounds()`: Get current round number
+- `recordMove(Action myMove, Action opponentMove)`: Record a move
 
 ## 2.4 PayoffMatrix Class
-
-Configurable payoff matrix:
-
-```java
-public class PayoffMatrix {
-    private int reward;        // R: both cooperate (default 3)
-    private int temptation;    // T: you defect, they cooperate (default 5)
-    private int punishment;    // P: both defect (default 1)
-    private int sucker;        // S: you cooperate, they defect (default 0)
-    
-    public PayoffMatrix();
-    public PayoffMatrix(int R, int T, int P, int S);
-    
-    public int[] getPayoff(Action myAction, Action opponentAction);
-    public int getMyScore(Action myAction, Action opponentAction);
-}
-```
-
-Standard payoff values (Axelrod's original):
-|       | Cooperate | Defect   |
-|-------|-----------|----------|
-| **Cooperate** | R=3, R=3 | S=0, T=5 |
-| **Defect**    | T=5, S=0 | P=1, P=1 |
+Configurable payoff matrix with four values:
+- **Reward (R)**: Both cooperate - default 3
+- **Temptation (T)**: You defect, they cooperate - default 5
+- **Punishment (P)**: Both defect - default 1
+- **Sucker (S)**: You cooperate, they defect - default 0
 
 ## 2.5 MatchResult Class
-
-```java
-public class MatchResult {
-    private Strategy playerA;
-    private Strategy playerB;
-    private List<Action> movesA;
-    private List<Action> movesB;
-    private int scoreA;
-    private int scoreB;
-    private double cooperationRateA;
-    private double cooperationRateB;
-    
-    public int getScore(Strategy player);
-    public double getCooperationRate(Strategy player);
-}
-```
+Contains results of a single match:
+- Player A and B strategies
+- Individual moves for each player
+- Final scores for each player
+- Cooperation rates for each player
 
 ## 2.6 TournamentResult Class
-
-```java
-public class TournamentResult {
-    private List<Strategy> strategies;
-    private Map<Strategy, Integer> totalScores;
-    private Map<Strategy, Double> cooperationRates;
-    private List<MatchResult> matchResults;
-    private List<Strategy> ranking;
-    
-    public int getScore(Strategy strategy);
-    public double getCooperationRate(Strategy strategy);
-    public List<Strategy> getRanking();
-    public List<MatchResult> getMatchesBetween(Strategy a, Strategy b);
-}
-```
+Contains results of an entire tournament:
+- Total scores for each strategy
+- Cooperation rates for each strategy
+- List of all match results
+- Ranked list of strategies by score
 
 ---
 
 # 3. Strategy Implementations
 
-## 3.1 Always Cooperate
+## 3.1 Basic Strategies
 
-Always chooses COOPERATE regardless of opponent.
+| Strategy | Behavior |
+|----------|----------|
+| **Always Cooperate** | Always chooses COOPERATE |
+| **Always Defect** | Always chooses DEFECT |
+| **Random** | Randomly chooses COOPERATE or DEFECT |
 
-```java
-public class AlwaysCooperate implements Strategy {
-    @Override
-    public String getName() { return "Always Cooperate"; }
-    
-    @Override
-    public Action nextMove(GameHistory history) {
-        return Action.COOPERATE;
-    }
-}
-```
+## 3.2 Reciprocal Strategies
 
-## 3.2 Always Defect
+| Strategy | Behavior |
+|----------|----------|
+| **Tit For Tat** | Cooperates first, then copies opponent's last move |
+| **Tit For Two Tats** | Like TFT but requires two defections before retaliating |
+| **Generous Tit For Tat** | Like TFT but occasionally forgives defections |
 
-Always chooses DEFECT regardless of opponent.
+## 3.3 Trigger Strategies
 
-```java
-public class AlwaysDefect implements Strategy {
-    @Override
-    public String getName() { return "Always Defect"; }
-    
-    @Override
-    public Action nextMove(GameHistory history) {
-        return Action.DEFECT;
-    }
-}
-```
+| Strategy | Behavior |
+|----------|----------|
+| **Grim Trigger** | Cooperates until opponent defects, then defects forever |
+| **Pavlov (Win-Stay, Lose-Shift)** | Repeats last move after reward/temptation, switches after punishment/sucker |
 
-## 3.3 Tit For Tat
-
-**The most famous strategy.** Cooperates on first move, then copies opponent's last move.
-
-```java
-public class TitForTat implements Strategy {
-    @Override
-    public String getName() { return "Tit For Tat"; }
-    
-    @Override
-    public Action nextMove(GameHistory history) {
-        if (history.isFirstMove()) {
-            return Action.COOPERATE;
-        }
-        return history.getOpponentLastMove();
-    }
-}
-```
-
-## 3.4 Tit For Two Tats
-
-Like Tit For Tat, but requires two defections to retaliate. More forgiving.
-
-```java
-public class TitForTwoTats implements Strategy {
-    @Override
-    public String getName() { return "Tit For Two Tats"; }
-    
-    @Override
-    public Action nextMove(GameHistory history) {
-        if (history.isFirstMove() || history.getTotalRounds() < 2) {
-            return Action.COOPERATE;
-        }
-        
-        int defectionCount = 0;
-        for (Action move : history.getOpponentMoves()) {
-            if (move == Action.DEFECT) defectionCount++;
-        }
-        
-        return defectionCount >= 2 ? Action.DEFECT : Action.COOPERATE;
-    }
-}
-```
-
-## 3.5 Grim Trigger
-
-Cooperates until opponent defects once, then defects forever.
-
-```java
-public class GrimTrigger implements Strategy {
-    private boolean triggered = false;
-    
-    @Override
-    public String getName() { return "Grim Trigger"; }
-    
-    @Override
-    public Action nextMove(GameHistory history) {
-        if (triggered) return Action.DEFECT;
-        
-        if (!history.isFirstMove() && history.getOpponentLastMove() == Action.DEFECT) {
-            triggered = true;
-            return Action.DEFECT;
-        }
-        return Action.COOPERATE;
-    }
-    
-    @Override
-    public void reset() { triggered = false; }
-}
-```
-
-## 3.6 Random Strategy
-
-Randomly chooses COOPERATE or DEFECT.
-
-```java
-public class RandomStrategy implements Strategy {
-    private Random random = new Random();
-    
-    @Override
-    public String getName() { return "Random"; }
-    
-    @Override
-    public Action nextMove(GameHistory history) {
-        return random.nextBoolean() ? Action.COOPERATE : Action.DEFECT;
-    }
-}
-```
-
-## 3.7 Pavlov (Win-Stay, Lose-Shift)
-
-If reward or temptation received, repeat last move. If punishment or sucker, switch.
-
-```java
-public class Pavlov implements Strategy {
-    @Override
-    public String getName() { return "Pavlov"; }
-    
-    @Override
-    public Action nextMove(GameHistory history) {
-        if (history.isFirstMove()) return Action.COOPERATE;
-        
-        Action myLastMove = history.getMyLastMove();
-        Action opponentLastMove = history.getOpponentLastMove();
-        
-        // Win (CC or DC) or Lose (DD or CD) - stay or shift accordingly
-        boolean won = (myLastMove == Action.COOPERATE && opponentLastMove == Action.COOPERATE)
-                   || (myLastMove == Action.DEFECT && opponentLastMove == Action.COOPERATE);
-        
-        return won ? myLastMove : (myLastMove == Action.COOPERATE ? Action.DEFECT : Action.COOPERATE);
-    }
-}
-```
-
-## 3.8 Generous Tit For Tat
-
-Like Tit For Tat, but occasionally cooperates when opponent defected (to repair relations).
-
-```java
-public class GenerousTFT implements Strategy {
-    private double generosity = 0.1; // 10% chance
-    
-    @Override
-    public String getName() { return "Generous Tit For Tat"; }
-    
-    @Override
-    public Action nextMove(GameHistory history) {
-        if (history.isFirstMove()) return Action.COOPERATE;
-        
-        if (history.getOpponentLastMove() == Action.DEFECT) {
-            return Math.random() < generosity ? Action.COOPERATE : Action.DEFECT;
-        }
-        return Action.COOPERATE;
-    }
-}
-```
-
-## 3.9 Custom Strategy Builder
-
-For user-defined strategies without coding:
-
-```java
-public class CustomStrategyBuilder {
-    public Strategy buildFromRules(
-        Action firstMove,
-        boolean copyOpponentOnDefect,
-        boolean copyOpponentOnCooperate,
-        int retaliationThreshold
-    ) {
-        // Build dynamic strategy
-    }
-}
-```
+## 3.4 Custom Strategy Builder
+A UI-based tool allowing users to create strategies without coding:
+- First move preference
+- Response to opponent defection
+- Response to opponent cooperation
+- Retaliation threshold
 
 ---
 
 # 4. Game Engine
 
 ## 4.1 Match Engine
+Plays a repeated game between two strategies for N rounds.
 
-Plays a single match between two strategies:
-
-```java
-public class Match {
-    private PayoffMatrix payoffMatrix;
-    private double noiseProbability = 0.0;
-    
-    public Match() {
-        this.payoffMatrix = new PayoffMatrix();
-    }
-    
-    public Match(PayoffMatrix payoffMatrix) {
-        this.payoffMatrix = payoffMatrix;
-    }
-    
-    public void setNoiseProbability(double probability) {
-        this.noiseProbability = probability;
-    }
-    
-    public MatchResult play(Strategy playerA, Strategy playerB, int rounds) {
-        GameHistory historyA = new GameHistory();
-        GameHistory historyB = new GameHistory();
-        List<Action> movesA = new ArrayList<>();
-        List<Action> movesB = new ArrayList<>();
-        
-        int scoreA = 0;
-        int scoreB = 0;
-        
-        playerA.reset();
-        playerB.reset();
-        
-        Random random = new Random();
-        
-        for (int i = 0; i < rounds; i++) {
-            Action moveA = playerA.nextMove(historyA);
-            Action moveB = playerB.nextMove(historyB);
-            
-            // Apply noise (randomly flip moves)
-            if (noiseProbability > 0) {
-                if (random.nextDouble() < noiseProbability) {
-                    moveA = (moveA == Action.COOPERATE) ? Action.DEFECT : Action.COOPERATE;
-                }
-                if (random.nextDouble() < noiseProbability) {
-                    moveB = (moveB == Action.COOPERATE) ? Action.DEFECT : Action.COOPERATE;
-                }
-            }
-            
-            // Calculate payoffs
-            int[] payoffs = payoffMatrix.getPayoff(moveA, moveB);
-            scoreA += payoffs[0];
-            scoreB += payoffs[1];
-            
-            // Record moves
-            movesA.add(moveA);
-            movesB.add(moveB);
-            historyA.recordMove(moveA, moveB);
-            historyB.recordMove(moveB, moveA);
-        }
-        
-        return new MatchResult(playerA, playerB, movesA, movesB, scoreA, scoreB);
-    }
-}
-```
+Key responsibilities:
+- Initialize fresh histories for both players
+- Loop through configured number of rounds
+- Get moves from both strategies
+- Apply noise (if configured) to randomly flip moves
+- Calculate payoffs using the payoff matrix
+- Record all moves in histories
+- Return MatchResult with scores and move history
 
 ## 4.2 Tournament Engine
+Runs round-robin tournaments where every strategy plays every other strategy.
 
-Runs round-robin tournaments:
-
-```java
-public class Tournament {
-    private Match match;
-    private int roundsPerMatch;
-    
-    public Tournament(int roundsPerMatch) {
-        this.match = new Match();
-        this.roundsPerMatch = roundsPerMatch;
-    }
-    
-    public TournamentResult run(List<Strategy> strategies) {
-        Map<Strategy, Integer> scores = new HashMap<>();
-        Map<Strategy, List<Action>> allMoves = new HashMap<>();
-        List<MatchResult> matchResults = new ArrayList<>();
-        
-        // Initialize scores
-        for (Strategy s : strategies) {
-            scores.put(s, 0);
-            allMoves.put(s, new ArrayList<>());
-        }
-        
-        // Round-robin: each pair plays each other twice (home and away)
-        for (int i = 0; i < strategies.size(); i++) {
-            for (int j = i + 1; j < strategies.size(); j++) {
-                Strategy a = strategies.get(i);
-                Strategy b = strategies.get(j);
-                
-                // Play once (A vs B)
-                MatchResult result1 = match.play(a, b, roundsPerMatch);
-                matchResults.add(result1);
-                scores.put(a, scores.get(a) + result1.getScoreA());
-                scores.put(b, scores.get(b) + result1.getScoreB());
-                allMoves.get(a).addAll(result1.getMovesA());
-                allMoves.get(b).addAll(result1.getMovesB());
-                
-                // Play again (B vs A) - swap roles
-                MatchResult result2 = match.play(b, a, roundsPerMatch);
-                matchResults.add(result2);
-                scores.put(a, scores.get(a) + result2.getScoreB());
-                scores.put(b, scores.get(b) + result2.getScoreA());
-                allMoves.get(a).addAll(result2.getMovesB());
-                allMoves.get(b).addAll(result2.getMovesA());
-            }
-        }
-        
-        return new TournamentResult(strategies, scores, matchResults);
-    }
-}
-```
+Key responsibilities:
+- Create score tracking for all strategies
+- For each pair of strategies, play matches (both home and away)
+- Accumulate scores from all matches
+- Calculate cooperation rates
+- Generate final rankings
+- Return TournamentResult
 
 ---
 
@@ -463,37 +142,22 @@ public class Tournament {
 
 ```
 src/main/java/com/axelrod/
-├── Main.java
-├── AxelrodApplication.java
-├── model/
+├── Main.java                    # Application entry point
+├── model/                       # Domain classes
 │   ├── Action.java
 │   ├── Strategy.java
 │   ├── GameHistory.java
 │   ├── PayoffMatrix.java
 │   ├── MatchResult.java
 │   └── TournamentResult.java
-├── strategies/
-│   ├── AlwaysCooperate.java
-│   ├── AlwaysDefect.java
-│   ├── TitForTat.java
-│   ├── TitForTwoTats.java
-│   ├── GrimTrigger.java
-│   ├── RandomStrategy.java
-│   ├── Pavlov.java
-│   └── GenerousTFT.java
-├── engine/
-│   ├── Match.java
-│   └── Tournament.java
-├── ui/
+├── strategies/                  # Built-in strategy implementations
+├── engine/                      # Game and tournament engines
+├── ui/                          # Controllers and views
 │   ├── MainController.java
-│   ├── StrategyListController.java
-│   ├── SettingsController.java
-│   └── ResultsController.java
-├── view/
-│   ├── MainView.fxml
-│   └── components/
-└── util/
-    └── CsvExporter.java
+│   └── ...
+├── view/                        # FXML layout files
+│   └── MainView.fxml
+└── util/                        # Utilities (export, etc.)
 ```
 
 ## 5.2 Main Window Layout
@@ -502,216 +166,108 @@ src/main/java/com/axelrod/
 ┌─────────────────────────────────────────────────────────────────────┐
 │  [Logo] Iterative Prisoner's Dilemma Simulator         [−][□][×]  │
 ├─────────────────────────────────────────────────────────────────────┤
-│  ┌─────────────────┐  ┌─────────────────────┐  ┌───────────────┐  │
-│  │   STRATEGIES    │  │   TOURNAMENT SETUP  │  │    RESULTS    │  │
-│  │                 │  │                     │  │               │  │
-│  │  ☑ Always C     │  │  Rounds: [200    ]   │  │  Rank Strategy│  │
-│  │  ☑ Always D     │  │  Noise:  [0.01  ]   │  │   1. TFT   487│  │
+│  ┌─────────────────┐  ┌─────────────────────┐  ┌───────────────┐   │
+│  │   STRATEGIES    │  │   TOURNAMENT SETUP  │  │    RESULTS    │   │
+│  │                 │  │                     │  │               │   │
+│  │  ☑ Always C     │  │  Rounds: [200    ]   │  │  Rank Strategy│   │
+│  │  ☑ Always D     │  │  Noise:  [0.01  ]   │  │   1. TFT   487│   │
 │  │  ☑ Tit For Tat  │  │                     │  │   2. AlwaysC 456│  │
 │  │  ☑ Random       │  │  Payoff Matrix:     │  │   3. Pavlov 423│  │
 │  │  ☐ Tit 2 Tats   │  │  R:[3] T:[5] P:[1] S:[0]  │   4. Random  312│  │
-│  │  ☐ Grim Trigger │  │                     │  │               │  │
-│  │                 │  │  [▶ Run Tournament] │  │  [Chart]      │  │
-│  │  [+ Add Custom] │  │                     │  │               │  │
-│  │  [Remove]       │  │                     │  │               │  │
-│  └─────────────────┘  └─────────────────────┘  └───────────────┘  │
+│  │  ☐ Grim Trigger │  │                     │  │               │   │
+│  │                 │  │  [▶ Run Tournament]  │  │  [Chart]      │   │
+│  │  [+ Add Custom] │  │                     │  │               │   │
+│  │  [Remove]       │  │                     │  │               │   │
+│  └─────────────────┘  └─────────────────────┘  └───────────────┘   │
 ├─────────────────────────────────────────────────────────────────────┤
-│  Status: Ready                                    Progress: ░░░░  │
+│  Status: Ready                                    Progress: ░░░░   │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-## 5.3 Controller Classes
+**Left Panel - Strategy Selection:**
+- Checkbox list of available strategies
+- Add custom strategy button
+- Remove selected button
 
-```java
-public class MainController {
-    @FXML private ListView<Strategy> strategyList;
-    @FXML private Spinner<Integer> roundsSpinner;
-    @FXML private Spinner<Double> noiseSpinner;
-    @FXML private TableView<ScoreEntry> resultsTable;
-    @FXML private BarChart<String, Number> scoreChart;
-    @FXML private ProgressBar progressBar;
-    @FXML private Label statusLabel;
-    
-    private ObservableList<Strategy> selectedStrategies;
-    private TournamentEngine tournamentEngine;
-    
-    @FXML
-    public void initialize() {
-        // Setup strategy list with checkboxes
-        // Setup results table columns
-        // Setup chart
-    }
-    
-    @FXML
-    public void runTournament() {
- Get        // selected strategies
-        // Get settings
-        // Run tournament in background thread
-        // Update UI with results
-    }
-}
-```
+**Center Panel - Tournament Settings:**
+- Rounds per match (default 200)
+- Noise probability (default 0.01)
+- Payoff matrix configuration (R, T, P, S values)
+- Run Tournament button
 
-## 5.4 Strategy Selection ListView
+**Right Panel - Results:**
+- Ranking table with strategy name and score
+- Bar chart visualization
+- Export button
 
-```java
-public class StrategyListCell extends ListCell<Strategy> {
-    private CheckBox checkBox;
-    
-    @Override
-    protected void updateItem(Strategy strategy, boolean empty) {
-        super.updateItem(strategy, empty);
-        if (strategy != null) {
-            checkBox.setText(strategy.getName());
-            checkBox.setSelected(isSelected());
-        }
-    }
-}
-```
+## 5.3 Controller Design
+
+**MainController:**
+- Manages overall application state
+- Coordinates between strategy list, settings, and results panels
+- Runs tournament in background thread
+- Updates progress bar and status label
+
+**StrategyListController:**
+- Populates strategy list from available implementations
+- Handles selection state
+- Manages add/remove operations
+
+**ResultsController:**
+- Updates table with tournament results
+- Renders charts
+- Handles sorting and filtering
 
 ---
 
 # 6. Visualization Features
 
 ## 6.1 Score Bar Chart
+Horizontal or vertical bar chart showing total scores for each strategy, sorted by rank.
 
-```java
-public class ScoreChartService {
-    public BarChart<String, Number> createScoreChart(TournamentResult result) {
-        BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        for (Strategy s : result.getRanking()) {
-            series.getData().add(new XYChart.Data<>(
-                s.getName(), 
-                result.getScore(s)
-            ));
-        }
-        
-        chart.getData().add(series);
-        return chart;
-    }
-}
-```
-
-## 6.2 Cooperation Rate Chart
-
-Shows what percentage of moves were cooperative:
-
-```java
-public double calculateCooperationRate(List<Action> moves) {
-    long cooperations = moves.stream()
-        .filter(m -> m == Action.COOPERATE)
-        .count();
-    return (double) cooperations / moves.size() * 100;
-}
-```
+## 6.2 Cooperation Rate Display
+Shows what percentage of each strategy's moves were cooperative, helpful for understanding strategy behavior.
 
 ## 6.3 Pairwise Heatmap
+Grid showing scores between each pair of strategies. Useful for understanding direct matchups.
 
-Shows scores between each pair of strategies:
-
-```
-            TFT  AlwaysC  AlwaysD  Random
-TFT         600   900      300      450
-AlwaysC     900   900      200      500
-AlwaysD     300   200      200      250
-Random      450   500      250      350
-```
+## 6.4 Match Details
+When clicking a result, show:
+- All moves made in sequence
+- Score progression over rounds
+- Key decision points
 
 ---
 
 # 7. Advanced Features
 
-## 7.1 Noise Implementation
-
-Noise models mistakes or miscommunications:
-
-```java
-public class NoisyMatch {
-    private double noiseProbability;
-    
-    public Action applyNoise(Action move) {
-        if (Math.random() < noiseProbability) {
-            return move == Action.COOPERATE ? Action.DEFECT : Action.COOPERATE;
-        }
-        return move;
-    }
-}
-```
-
-Effects:
+## 7.1 Noise
+Simulates mistakes or miscommunications where a move is randomly flipped:
+- Configurable probability (0-100%)
+- Applied independently to each player's move
 - Low noise (1-5%): Tit For Tat still performs well
 - High noise (>10%): Generous strategies outperform
 
 ## 7.2 Evolutionary Tournament
+Simulates population dynamics over generations:
+- Initial population with equal representation
+- Each generation plays round-robin
+- Reproduction proportional to score
+- Track population share over time
+- Visualize with line chart
 
-Strategies reproduce proportional to their scores:
+## 7.3 Custom Strategy Builder
+GUI-based strategy creation:
+- Select first move (Cooperate/Defect/Random)
+- Configure response to opponent cooperation
+- Configure response to opponent defection
+- Set retaliation thresholds
+- Test against built-in strategies
 
-```java
-public class EvolutionaryTournament {
-    private int populationSize;
-    private int generations;
-    
-    public EvolutionResult evolve(List<Strategy> strategies, int initialRounds) {
-        Map<Strategy, Integer> population = new LinkedHashMap<>();
-        
-        // Initialize equal population
-        for (Strategy s : strategies) {
-            population.put(s, populationSize / strategies.size());
-        }
-        
-        List<GenerationResult> history = new ArrayList<>();
-        
-        for (int gen = 0; gen < generations; gen++) {
-            // Play tournament
-            TournamentResult result = runRound(population);
-            
-            // Record generation
-            history.add(new GenerationResult(population, result.getScores()));
-            
-            // Reproduce based on scores
-            population = reproduce(result.getScores());
-        }
-        
-        return new EvolutionResult(history);
-    }
-    
-    private Map<Strategy, Integer> reproduce(Map<Strategy, Integer> scores) {
-        int totalScore = scores.values().stream().mapToInt(Integer::intValue).sum();
-        Map<Strategy, Integer> newPopulation = new LinkedHashMap<>();
-        
-        for (Strategy s : scores.keySet()) {
-            double proportion = (double) scores.get(s) / totalScore;
-            newPopulation.put(s, (int) (proportion * populationSize));
-        }
-        
-        return newPopulation;
-    }
-}
-```
-
-## 7.3 CSV Export
-
-```java
-public class CsvExporter {
-    public void exportResults(TournamentResult result, String filename) {
-        try (PrintWriter writer = new PrintWriter(filename)) {
-            // Header
-            writer.println("Strategy,Score,Cooperation Rate");
-            
-            // Data rows
-            for (Strategy s : result.getRanking()) {
-                writer.printf("%s,%d,%.2f%n",
-                    s.getName(),
-                    result.getScore(s),
-                    result.getCooperationRate(s) * 100
-                );
-            }
-        }
-    }
-}
-```
+## 7.4 Export Options
+- **CSV**: Strategy, Score, Cooperation Rate
+- **JSON**: Full tournament data with match details
+- **Screenshot**: Save chart as PNG
 
 ---
 
@@ -722,13 +278,11 @@ public class CsvExporter {
 | Task | Description |
 |------|-------------|
 | Create project structure | Maven/Gradle, JavaFX setup |
-| Implement Action enum | COOPERATE, DEFECT |
-| Implement Strategy interface | Base interface |
-| Implement GameHistory | History tracking |
-| Implement 3 basic strategies | AlwaysC, AlwaysD, TFT |
+| Implement domain model | Action, Strategy, GameHistory, etc. |
+| Implement 3-4 basic strategies | AlwaysC, AlwaysD, TFT, Random |
 | Implement Match engine | Single match execution |
 | Implement Tournament engine | Round-robin execution |
-| Console testing | Verify results |
+| Console testing | Verify tournament runs correctly |
 
 **Deliverable:** Command-line tournament runner
 
@@ -738,21 +292,21 @@ public class CsvExporter {
 |------|-------------|
 | Setup JavaFX project | Scene Builder, FXML |
 | Main window layout | Three-panel design |
-| Strategy selection list | Checkbox list |
-| Settings panel | Spinners for rounds, noise |
+| Strategy selection list | Checkbox list with all strategies |
+| Settings panel | Spinners for rounds, noise, payoff values |
 | Results table | Sortable ranking table |
 | Run button + progress | Async tournament execution |
 
-**Deliverable:** Functional desktop app with UI
+**Deliverable:** Functional desktop app with basic UI
 
 ## Phase 3: Visualization (Week 3)
 
 | Task | Description |
 |------|-------------|
-| Score bar chart | JavaFX BarChart |
-| Cooperation rate chart | Second chart |
-| Heatmap view | Pairwise results |
-| Statistics panel | Detailed match info |
+| Score bar chart | JavaFX BarChart integration |
+| Cooperation rate display | Add column to results table |
+| Heatmap view | Grid showing pairwise results |
+| Match detail view | Click to see individual match data |
 
 **Deliverable:** Visual analysis tools
 
@@ -761,9 +315,10 @@ public class CsvExporter {
 | Task | Description |
 |------|-------------|
 | Custom strategy builder | UI-based strategy creation |
-| Noise settings | Configurable mistake rate |
+| Noise configuration | Sliders and testing |
 | Evolutionary mode | Population dynamics |
 | Export functionality | CSV/JSON export |
+| Polish | Error handling, styling |
 
 **Deliverable:** Full-featured application
 
@@ -772,89 +327,37 @@ public class CsvExporter {
 # 9. Testing Plan
 
 ## Unit Tests
-
-```java
-class TitForTatTest {
-    @Test
-    void cooperatesOnFirstMove() {
-        Strategy tft = new TitForTat();
-        GameHistory history = new GameHistory();
-        
-        assertEquals(Action.COOPERATE, tft.nextMove(history));
-    }
-    
-    @Test
-    void copiesOpponentLastMove() {
-        Strategy tft = new TitForTat();
-        GameHistory history = new GameHistory();
-        
-        history.recordMove(Action.COOPERATE, Action.DEFECT);
-        
-        assertEquals(Action.DEFECT, tft.nextMove(history));
-    }
-}
-```
+Test individual strategies and components:
+- Strategy decision logic
+- GameHistory tracking
+- Payoff calculations
+- Match result computation
 
 ## Integration Tests
+Test component interactions:
+- Tournament produces correct rankings
+- Results match expected behavior from Axelrod's research
+- UI updates correctly after tournament
 
-```java
-class TournamentIntegrationTest {
-    @Test
-    void titForTatOutperformsAlwaysDefect() {
-        List<Strategy> strategies = Arrays.asList(
-            new TitForTat(),
-            new AlwaysDefect()
-        );
-        
-        Tournament tournament = new Tournament(200);
-        TournamentResult result = tournament.run(strategies);
-        
-        assertTrue(result.getScore(new TitForTat()) > 
-                   result.getScore(new AlwaysDefect()));
-    }
-}
-```
+## Key Test Cases
+- Tit For Tat scores higher than Always Defect
+- Grim Trigger cooperates with itself
+- Random performs worse than reciprocal strategies
+- Two generous strategies achieve mutual cooperation
 
 ---
 
-# 10. Configuration
-
-## pom.xml dependencies
-
-```xml
-<dependencies>
-    <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-controls</artifactId>
-        <version>17.0.2</version>
-    </dependency>
-    <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-fxml</artifactId>
-        <version>17.0.2</version>
-    </dependency>
-    <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter</artifactId>
-        <version>5.9.0</version>
-        <scope>test</scope>
-    </dependency>
-</dependencies>
-```
-
----
-
-# 11. Key Insights from Axelrod's Research
+# 10. Key Insights from Axelrod's Research
 
 1. **Tit For Tat wins consistently** - Its success comes from being nice, retaliatory, and forgiving.
 
-2. **Nice strategies win** - Never defect first. Being nice is evolutionarily stable.
+2. **Nice strategies win** - Never defect first. Being nice is evolutionarily stable in most environments.
 
-3. **Retaliation maintains cooperation** - Once established, cooperation must be defended.
+3. **Retaliation maintains cooperation** - Once established, cooperation must be defended against exploitation.
 
-4. **Forgiveness helps recover** - After accidental defection (noise), forgiving strategies recover faster.
+4. **Forgiveness helps recover** - After accidental defection (noise), forgiving strategies recover cooperation faster.
 
-5. ** Clarity matters** - Strategies should be understandable to others.
+5. **Clarity matters** - Strategies should be understandable to promote mutual cooperation.
 
 ---
 
