@@ -1,4 +1,4 @@
-package dev.ahwz.model;
+package dev.ahwz.ipd.model;
 
 import java.util.List;
 

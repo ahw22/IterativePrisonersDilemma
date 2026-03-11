@@ -1,4 +1,4 @@
-package dev.ahwz.model;
+package dev.ahwz.ipd.model;
 
 public interface Strategy {
     String getName();

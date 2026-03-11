@@ -1,9 +1,9 @@
-package dev.ahwz.util;
+package dev.ahwz.ipd.util;
 
-import dev.ahwz.engine.Tournament;
-import dev.ahwz.model.MatchResult;
-import dev.ahwz.model.RoundResult;
-import dev.ahwz.model.Strategy;
+import dev.ahwz.ipd.engine.Tournament;
+import dev.ahwz.ipd.model.MatchResult;
+import dev.ahwz.ipd.model.RoundResult;
+import dev.ahwz.ipd.model.Strategy;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

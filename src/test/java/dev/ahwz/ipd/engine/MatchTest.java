@@ -1,10 +1,10 @@
-package dev.ahwz.engine;
+package dev.ahwz.ipd.engine;
 
-import dev.ahwz.model.MatchResult;
-import dev.ahwz.model.PayoffMatrix;
-import dev.ahwz.model.Strategy;
-import dev.ahwz.strategies.AlwaysCooporate;
-import dev.ahwz.strategies.AlwaysDefect;
+import dev.ahwz.ipd.model.MatchResult;
+import dev.ahwz.ipd.model.PayoffMatrix;
+import dev.ahwz.ipd.model.Strategy;
+import dev.ahwz.ipd.strategies.AlwaysCooporate;
+import dev.ahwz.ipd.strategies.AlwaysDefect;
 import org.junit.jupiter.api.Test;
 
 class MatchTest {

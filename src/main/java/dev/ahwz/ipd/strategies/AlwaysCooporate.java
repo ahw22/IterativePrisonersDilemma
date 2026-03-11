@@ -1,8 +1,8 @@
-package dev.ahwz.strategies;
+package dev.ahwz.ipd.strategies;
 
-import dev.ahwz.model.Action;
-import dev.ahwz.model.GameHistory;
-import dev.ahwz.model.Strategy;
+import dev.ahwz.ipd.model.Action;
+import dev.ahwz.ipd.model.GameHistory;
+import dev.ahwz.ipd.model.Strategy;
 
 public class AlwaysCooporate implements Strategy {
 

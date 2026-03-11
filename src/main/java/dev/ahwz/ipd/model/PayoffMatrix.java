@@ -1,4 +1,4 @@
-package dev.ahwz.model;
+package dev.ahwz.ipd.model;
 
 // Formula:  T > R > P > S && R > (S + T)/2
 // Default= R = 3, T = 5, P = 1, S = 0

@@ -1,13 +1,13 @@
-package dev.ahwz;
+package dev.ahwz.ipd;
 
-import dev.ahwz.engine.Tournament;
-import dev.ahwz.model.PayoffMatrix;
-import dev.ahwz.model.Strategy;
-import dev.ahwz.strategies.AlwaysCooporate;
-import dev.ahwz.strategies.AlwaysDefect;
-import dev.ahwz.strategies.RandomStrategy;
-import dev.ahwz.strategies.TitForTat;
-import dev.ahwz.util.TournamentCsvExporter;
+import dev.ahwz.ipd.engine.Tournament;
+import dev.ahwz.ipd.model.PayoffMatrix;
+import dev.ahwz.ipd.model.Strategy;
+import dev.ahwz.ipd.strategies.AlwaysCooporate;
+import dev.ahwz.ipd.strategies.AlwaysDefect;
+import dev.ahwz.ipd.strategies.RandomStrategy;
+import dev.ahwz.ipd.strategies.TitForTat;
+import dev.ahwz.ipd.util.TournamentCsvExporter;
 
 import java.util.List;
 
