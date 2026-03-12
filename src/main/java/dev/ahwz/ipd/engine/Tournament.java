@@ -14,6 +14,7 @@ import java.util.Map;
 public class Tournament {
     private final List<Strategy> strategies;
     private final Map<Strategy, Double> totalScores;
+    private final Map<Strategy, Double> coopRates;
     private final List<MatchResult> matchResults;
     private final List<Strategy> ranking;
     private final int rounds;
@@ -22,6 +23,7 @@ public class Tournament {
         this.strategies = strategies;
         this.rounds = rounds;
         totalScores = new HashMap<>();
+        coopRates = new HashMap<>();
         matchResults = new ArrayList<>();
         ranking = new ArrayList<>();
     }
@@ -46,16 +48,23 @@ public class Tournament {
 
     private void calculateScores() {
         Map<Strategy, List<Integer>> allScoresMap = new HashMap<>();
+        Map<Strategy, List<Double>> allRatesMap = new HashMap<>();
+
         for (Strategy s : strategies) {
             allScoresMap.put(s, new ArrayList<>());
+            allRatesMap.put(s, new ArrayList<>());
         }
 
         matchResults.forEach(matchResult -> {
             List<Integer> scoresA = allScoresMap.get(matchResult.playerA());
             scoresA.add(matchResult.scoreA());
+            List<Double> coopRatesA = allRatesMap.get(matchResult.playerA());
+            coopRatesA.add(matchResult.coopRateA());
 
             List<Integer> scoresB = allScoresMap.get(matchResult.playerB());
             scoresB.add(matchResult.scoreB());
+            List<Double> coopRatesB = allRatesMap.get(matchResult.playerB());
+            coopRatesB.add(matchResult.coopRateB());
         });
 
         allScoresMap.forEach((strategy, scores) -> {
@@ -66,7 +75,13 @@ public class Tournament {
             totalScores.put(strategy, average);
         });
 
-
+        allRatesMap.forEach((strategy, rates) -> {
+            double average = rates.stream()
+                    .mapToDouble(Double::doubleValue)
+                    .average()
+                    .orElse(0);
+            coopRates.put(strategy, average);
+        });
     }
 
     public double getScore(Strategy strategy) {
