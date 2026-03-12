@@ -95,5 +95,7 @@ public class Tournament {
                 .toList();
     }
 
+    public double getCoopRate(Strategy strategy) {return coopRates.get(strategy); }
+
 
 }

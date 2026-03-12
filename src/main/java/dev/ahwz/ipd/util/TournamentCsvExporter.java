@@ -31,7 +31,7 @@ public class TournamentCsvExporter {
 
         try (BufferedWriter writer = Files.newBufferedWriter(file)) {
 
-            writer.write("Rank,Strategy,AverageScore");
+            writer.write("Rank,Strategy,AverageScore,Cooperation rates %");
             writer.newLine();
 
             int rank = 1;
@@ -40,7 +40,7 @@ public class TournamentCsvExporter {
 
                 double score = tournament.getScore(strategy);
 
-                writer.write(rank + "," + strategy.getName() + "," + score);
+                writer.write(rank + "," + strategy.getName() + "," + score + "," + tournament.getCoopRate(strategy));
                 writer.newLine();
 
                 rank++;
