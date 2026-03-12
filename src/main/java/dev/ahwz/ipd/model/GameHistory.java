@@ -25,11 +25,30 @@ public class GameHistory {
     public Action getLastPlayerAction() {
         return playerActions.getLast();
     }
-    private boolean isFirstMove() {
+    public boolean isFirstMove() {
         return playerActions.isEmpty();
     }
-    private boolean isLastMove() {
+    public boolean isLastMove() {
         return playerActions.size() == rounds - 1;
+    }
+
+    /**
+     * Returns n to last player action. If n is larger than number of actions returns null
+     * @param n distance to last action
+     * @return Action or null
+     */
+    public Action getNToLastPlayerAction(int n) {
+        if (n > playerActions.size()) return null;
+        return playerActions.get(playerActions.size() - n);
+    }
+    /**
+     * Returns n to last opponent action. If n is larger than number of actions returns null
+     * @param n distance to last action
+     * @return Action or null
+     */
+    public Action getNToLastOpponentAction(int n) {
+        if (n > opponentActions.size()) return null;
+        return opponentActions.get(opponentActions.size() - n);
     }
 
     public void recordMove(Action playerMove, Action opponentMove) {
