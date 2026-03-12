@@ -6,10 +6,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import dev.ahwz.ipd.engine.Tournament;
 import dev.ahwz.ipd.model.PayoffMatrix;
 import dev.ahwz.ipd.model.Strategy;
-import dev.ahwz.ipd.strategies.AlwaysCooporate;
-import dev.ahwz.ipd.strategies.AlwaysDefect;
-import dev.ahwz.ipd.strategies.RandomStrategy;
-import dev.ahwz.ipd.strategies.TitForTat;
+import dev.ahwz.ipd.strategies.*;
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -158,10 +155,9 @@ public class SwingGui extends JFrame {
 
         // Checkboxes - only implemented strategies
         String[] strategyNames = {
-                "Always Cooperate", "Always Defect", "Tit For Tat",
-                "Random"
+                "Always Cooperate", "Always Defect", "Tit For Tat", "Tit For Two Tats", "Generous Tit For Tat",
+                "Suspicious Tit For Tat", "Grim Trigger", "Pavlov", "Random"
         };
-        boolean[] defaults = { true, true, true, true };
 
         JPanel listPanel = new JPanel();
         listPanel.setOpaque(false);
@@ -169,7 +165,7 @@ public class SwingGui extends JFrame {
         listPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
 
         for (int i = 0; i < strategyNames.length; i++) {
-            JCheckBox cb = new JCheckBox(strategyNames[i], defaults[i]);
+            JCheckBox cb = new JCheckBox(strategyNames[i], true);
             cb.setOpaque(false);
             cb.setFont(new Font("Monospaced", Font.PLAIN, 12));
             cb.setForeground(TEXT_MAIN);
@@ -569,6 +565,21 @@ public class SwingGui extends JFrame {
         }
         if (strategyCheckboxes.get("Tit For Tat").isSelected()) {
             selectedStrategies.add(new TitForTat());
+        }
+        if (strategyCheckboxes.get("Generous Tit For Tat").isSelected()) {
+            selectedStrategies.add(new GenerousTitForTat());
+        }
+        if (strategyCheckboxes.get("Tit For Two Tats").isSelected()) {
+            selectedStrategies.add(new TitForTwoTats());
+        }
+        if (strategyCheckboxes.get("Suspicious Tit For Tat").isSelected()) {
+            selectedStrategies.add(new SuspiciousTitForTat());
+        }
+        if (strategyCheckboxes.get("Grim Trigger").isSelected()) {
+            selectedStrategies.add(new GrimTrigger());
+        }
+        if (strategyCheckboxes.get("Pavlov").isSelected()) {
+            selectedStrategies.add(new Pavlov());
         }
         if (strategyCheckboxes.get("Random").isSelected()) {
             selectedStrategies.add(new RandomStrategy());
