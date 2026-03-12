@@ -4,11 +4,12 @@ import dev.ahwz.ipd.model.Action;
 import dev.ahwz.ipd.model.GameHistory;
 import dev.ahwz.ipd.model.Strategy;
 
-public class TitForTat implements Strategy {
+import java.util.List;
 
+public class TitForTwoTats implements Strategy {
     @Override
     public String getName() {
-        return "Tit for Tat";
+        return "Tit for two Tats";
     }
 
     @Override
@@ -16,10 +17,11 @@ public class TitForTat implements Strategy {
         if (history.isFirstMove()) {
             return Action.COOPERATE;
         }
-        if (history.getLastOpponentAction() == Action.COOPERATE) {
-            return Action.COOPERATE;
-        } else {
+        List<Action> opponentActions = history.getOpponentActions();
+        if (history.getLastOpponentAction() == Action.DEFECT && history.getNToLastOpponentAction(2) == Action.DEFECT) {
             return Action.DEFECT;
+        } else {
+            return Action.COOPERATE;
         }
     }
 }
