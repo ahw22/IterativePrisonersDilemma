@@ -10,13 +10,10 @@ A JavaFX desktop application that simulates Robert Axelrod's famous tournaments 
 
 1. **Strategy Management**
    - Pre-built strategies (Tit For Tat, Always Defect, etc.)
-   - Custom strategy creation via UI
-   - Strategy parameter configuration
 
 2. **Tournament Execution**
    - Round-robin tournaments
    - Configurable rounds per match
-   - Noise/mistake probability
    - Custom payoff matrices
 
 3. **Results & Visualization**
@@ -26,9 +23,35 @@ A JavaFX desktop application that simulates Robert Axelrod's famous tournaments 
    - Pairwise match results
 
 4. **Advanced Features**
-   - Evolutionary tournaments (reproduction based on scores)
    - Strategy performance heatmaps
    - Export results to CSV/JSON
+
+---
+
+# Future Additions
+
+## Noise
+Simulates mistakes or miscommunications where a move is randomly flipped:
+- Configurable probability (0-100%)
+- Applied independently to each player's move
+- Low noise (1-5%): Tit For Tat still performs well
+- High noise (>10%): Generous strategies outperform
+
+## Evolutionary Tournament
+Simulates population dynamics over generations:
+- Initial population with equal representation
+- Each generation plays round-robin
+- Reproduction proportional to score
+- Track population share over time
+- Visualize with line chart
+
+## Custom Strategy Builder
+GUI-based strategy creation:
+- Select first move (Cooperate/Defect/Random)
+- Configure response to opponent cooperation
+- Configure response to opponent defection
+- Set retaliation thresholds
+- Test against built-in strategies
 
 ---
 
@@ -170,14 +193,13 @@ src/main/java/com/axelrod/
 │  │   STRATEGIES    │  │   TOURNAMENT SETUP  │  │    RESULTS    │   │
 │  │                 │  │                     │  │               │   │
 │  │  ☑ Always C     │  │  Rounds: [200    ]   │  │  Rank Strategy│   │
-│  │  ☑ Always D     │  │  Noise:  [0.01  ]   │  │   1. TFT   487│   │
-│  │  ☑ Tit For Tat  │  │                     │  │   2. AlwaysC 456│  │
-│  │  ☑ Random       │  │  Payoff Matrix:     │  │   3. Pavlov 423│  │
-│  │  ☐ Tit 2 Tats   │  │  R:[3] T:[5] P:[1] S:[0]  │   4. Random  312│  │
-│  │  ☐ Grim Trigger │  │                     │  │               │   │
+│  │  ☑ Always D     │  │                     │  │   1. TFT   487│   │
+│  │  ☑ Tit For Tat  │  │  Payoff Matrix:     │  │   2. AlwaysC 456│  │
+│  │  ☑ Random       │  │  R:[3] T:[5] P:[1] S:[0]  │   3. Pavlov 423│  │
+│  │                 │  │                     │  │   4. Random  312│  │
+│  │                 │  │                     │  │               │   │
 │  │                 │  │  [▶ Run Tournament]  │  │  [Chart]      │   │
-│  │  [+ Add Custom] │  │                     │  │               │   │
-│  │  [Remove]       │  │                     │  │               │   │
+│  │                 │  │                     │  │               │   │
 │  └─────────────────┘  └─────────────────────┘  └───────────────┘   │
 ├─────────────────────────────────────────────────────────────────────┤
 │  Status: Ready                                    Progress: ░░░░   │
@@ -186,12 +208,9 @@ src/main/java/com/axelrod/
 
 **Left Panel - Strategy Selection:**
 - Checkbox list of available strategies
-- Add custom strategy button
-- Remove selected button
 
 **Center Panel - Tournament Settings:**
 - Rounds per match (default 200)
-- Noise probability (default 0.01)
 - Payoff matrix configuration (R, T, P, S values)
 - Run Tournament button
 
@@ -239,32 +258,8 @@ When clicking a result, show:
 
 ---
 
-# 7. Advanced Features
+# 7. Export Options
 
-## 7.1 Noise
-Simulates mistakes or miscommunications where a move is randomly flipped:
-- Configurable probability (0-100%)
-- Applied independently to each player's move
-- Low noise (1-5%): Tit For Tat still performs well
-- High noise (>10%): Generous strategies outperform
-
-## 7.2 Evolutionary Tournament
-Simulates population dynamics over generations:
-- Initial population with equal representation
-- Each generation plays round-robin
-- Reproduction proportional to score
-- Track population share over time
-- Visualize with line chart
-
-## 7.3 Custom Strategy Builder
-GUI-based strategy creation:
-- Select first move (Cooperate/Defect/Random)
-- Configure response to opponent cooperation
-- Configure response to opponent defection
-- Set retaliation thresholds
-- Test against built-in strategies
-
-## 7.4 Export Options
 - **CSV**: Strategy, Score, Cooperation Rate
 - **JSON**: Full tournament data with match details
 - **Screenshot**: Save chart as PNG
@@ -310,17 +305,14 @@ GUI-based strategy creation:
 
 **Deliverable:** Visual analysis tools
 
-## Phase 4: Advanced Features (Week 4)
+## Phase 4: Polish & Export (Week 4)
 
 | Task | Description |
 |------|-------------|
-| Custom strategy builder | UI-based strategy creation |
-| Noise configuration | Sliders and testing |
-| Evolutionary mode | Population dynamics |
 | Export functionality | CSV/JSON export |
 | Polish | Error handling, styling |
 
-**Deliverable:** Full-featured application
+**Deliverable:** Production-ready application
 
 ---
 
