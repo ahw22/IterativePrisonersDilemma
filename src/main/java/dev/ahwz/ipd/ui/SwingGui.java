@@ -127,7 +127,7 @@ public class SwingGui extends JFrame {
         left.add(new LogoIcon());
 
         JLabel title = new JLabel("Iterated Prisoner's Dilemma Simulator");
-        title.setFont(new Font("Monospaced", Font.BOLD, 15));
+        title.setFont(new Font("Monospaced", Font.BOLD, 20));
         title.setForeground(ACCENT);
         left.add(title);
 
@@ -256,12 +256,12 @@ public class SwingGui extends JFrame {
         matrixLabel.setForeground(ACCENT);
         matrixLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         inner.add(matrixLabel);
-        inner.add(Box.createVerticalStrut(8));
+        inner.add(Box.createVerticalStrut(16));
 
         // R, T, P, S fields in a 2x2 grid
         JPanel matrix = new JPanel(new GridLayout(2, 2, 8, 6));
         matrix.setOpaque(false);
-        matrix.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
+        matrix.setMaximumSize(new Dimension(Integer.MAX_VALUE, 110));
         matrix.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         rewardField = createMatrixTextField("3");
