@@ -95,7 +95,7 @@ public class SwingGui extends JFrame {
         super("Iterated Prisoner's Dilemma Simulator");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(960, 620));
-        setPreferredSize(new Dimension(1400, 900));
+        setPreferredSize(new Dimension(1600, 900));
         getContentPane().setBackground(SURFACE);
 
         setLayout(new BorderLayout(0, 0));
@@ -139,13 +139,28 @@ public class SwingGui extends JFrame {
 
     // ── Three-column main area ───────────────────────────────────────────────
     private JPanel buildMainArea() {
-        JPanel main = new JPanel(new GridLayout(1, 3, 8, 0));
+        JPanel main = new JPanel(new GridBagLayout());
         main.setBackground(SURFACE);
         main.setBorder(BorderFactory.createEmptyBorder(12, 12, 8, 12));
-
-        main.add(buildStrategiesPanel());
-        main.add(buildTournamentPanel());
-        main.add(buildResultsPanel());
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 0, 0, 8);
+        
+        gbc.gridx = 0;
+        gbc.weightx = 0.25;
+        main.add(buildStrategiesPanel(), gbc);
+        
+        gbc.gridx = 1;
+        gbc.weightx = 0.4;
+        gbc.insets = new Insets(0, 0, 0, 8);
+        main.add(buildTournamentPanel(), gbc);
+        
+        gbc.gridx = 2;
+        gbc.weightx = 0.35;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        main.add(buildResultsPanel(), gbc);
+        
         return main;
     }
 
@@ -349,7 +364,7 @@ public class SwingGui extends JFrame {
         };
 
         JTable table = new JTable(resultsModel);
-        table.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        table.setFont(new Font("Monospaced", Font.PLAIN, 16));
         table.setRowHeight(22);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
@@ -363,10 +378,12 @@ public class SwingGui extends JFrame {
         table.getColumnModel().getColumn(3).setCellRenderer(rightAlign);
 
         // Column widths
-        table.getColumnModel().getColumn(0).setPreferredWidth(28);
+        table.getColumnModel().getColumn(0).setPreferredWidth(45);
+        table.getColumnModel().getColumn(0).setMaxWidth(45);
         table.getColumnModel().getColumn(1).setPreferredWidth(120);
         table.getColumnModel().getColumn(2).setPreferredWidth(50);
-        table.getColumnModel().getColumn(3).setPreferredWidth(50);
+        table.getColumnModel().getColumn(3).setPreferredWidth(100);
+        table.getColumnModel().getColumn(3).setMaxWidth(125);
 
         JScrollPane scroll = new JScrollPane(table);
         scroll.setBorder(BorderFactory.createLineBorder(BORDER_COLOR));
@@ -674,11 +691,12 @@ public class SwingGui extends JFrame {
         for (int i = 0; i < ranking.size(); i++) {
             Strategy strategy = ranking.get(i);
             double score = tournament.getScore(strategy);
+            double coopRate = tournament.getCoopRates().getOrDefault(strategy, 0.0);
             resultsModel.addRow(new Object[]{
                 String.valueOf(i + 1),
                 strategy.getName(),
                 String.format("%.1f", score),
-                "-"  // Cooperation % - not yet calculated
+                String.format("%.0f%%", coopRate * 100)
             });
         }
     }
