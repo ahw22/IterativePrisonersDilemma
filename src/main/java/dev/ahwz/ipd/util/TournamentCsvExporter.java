@@ -106,6 +106,8 @@ public class TournamentCsvExporter {
                     round++;
                 }
                 writer.write("SUM,,," + match.scoreA() + "," + match.scoreB());
+                writer.newLine();
+                writer.write("CoopRates:," + match.coopRateA() + "," + match.coopRateB());
             }
 
             matchIndex++;
