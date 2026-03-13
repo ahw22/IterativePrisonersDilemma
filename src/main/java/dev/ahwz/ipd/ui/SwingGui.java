@@ -6,6 +6,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import dev.ahwz.ipd.engine.Tournament;
 import dev.ahwz.ipd.model.PayoffMatrix;
 import dev.ahwz.ipd.model.Strategy;
+import dev.ahwz.ipd.registry.StrategyRegistry;
 import dev.ahwz.ipd.strategies.*;
 
 import javax.swing.*;
@@ -17,30 +18,30 @@ import java.util.List;
 /**
  * Main application window for the Iterated Prisoner's Dilemma Simulator.
  * Uses FlatLaf dark theme with a three-panel layout matching the wireframe.
- *
+ * <p>
  * Layout:
- *   ┌──────────────────────────────────────────┐
- *   │  Header (logo + title)                   │
- *   ├────────────┬──────────────┬──────────────┤
- *   │ Strategies │  Tournament  │   Results    │
- *   │   Panel    │  Setup Panel │   Panel      │
- *   ├────────────┴──────────────┴──────────────┤
- *   │  Status bar + progress bar               │
- *   └──────────────────────────────────────────┘
+ * ┌──────────────────────────────────────────┐
+ * │  Header (logo + title)                   │
+ * ├────────────┬──────────────┬──────────────┤
+ * │ Strategies │  Tournament  │   Results    │
+ * │   Panel    │  Setup Panel │   Panel      │
+ * ├────────────┴──────────────┴──────────────┤
+ * │  Status bar + progress bar               │
+ * └──────────────────────────────────────────┘
  */
 public class SwingGui extends JFrame {
 
     // ── Accent colour used throughout ──────────────────────────────────────
-    private static final Color ACCENT       = new Color(0x4FC3F7);   // cyan-blue
-    private static final Color ACCENT_DIM   = new Color(0x1A3A4A);
-    private static final Color SURFACE      = new Color(0x1E2533);
-    private static final Color SURFACE2     = new Color(0x252D3D);
+    private static final Color ACCENT = new Color(0x4FC3F7);   // cyan-blue
+    private static final Color ACCENT_DIM = new Color(0x1A3A4A);
+    private static final Color SURFACE = new Color(0x1E2533);
+    private static final Color SURFACE2 = new Color(0x252D3D);
     private static final Color BORDER_COLOR = new Color(0x2E3A50);
-    private static final Color TEXT_MUTED   = new Color(0x8899AA);
-    private static final Color TEXT_MAIN    = new Color(0xDDEEFF);
+    private static final Color TEXT_MUTED = new Color(0x8899AA);
+    private static final Color TEXT_MAIN = new Color(0xDDEEFF);
 
     // ── State ───────────────────────────────────────────────────────────────
-    private JLabel   statusLabel;
+    private JLabel statusLabel;
     private JProgressBar progressBar;
     private DefaultTableModel resultsModel;
 
@@ -65,29 +66,31 @@ public class SwingGui extends JFrame {
         });
     }
 
-    /** Fine-tune FlatLaf UI defaults to match our dark sci-fi palette. */
+    /**
+     * Fine-tune FlatLaf UI defaults to match our dark sci-fi palette.
+     */
     private static void customizeFlatLaf() {
-        UIManager.put("Panel.background",               SURFACE);
-        UIManager.put("RootPane.background",            SURFACE);
-        UIManager.put("ScrollPane.background",          SURFACE);
-        UIManager.put("Viewport.background",            SURFACE);
-        UIManager.put("Table.background",               SURFACE2);
-        UIManager.put("Table.alternateRowColor",        SURFACE);
-        UIManager.put("Table.selectionBackground",      ACCENT_DIM);
-        UIManager.put("Table.selectionForeground",      TEXT_MAIN);
-        UIManager.put("TableHeader.background",         SURFACE);
-        UIManager.put("TableHeader.foreground",         ACCENT);
-        UIManager.put("TextField.background",           SURFACE2);
-        UIManager.put("TextField.foreground",           TEXT_MAIN);
-        UIManager.put("TextField.caretForeground",      ACCENT);
-        UIManager.put("CheckBox.foreground",            TEXT_MAIN);
-        UIManager.put("Button.background",              SURFACE2);
-        UIManager.put("Button.foreground",              TEXT_MAIN);
-        UIManager.put("ProgressBar.foreground",         ACCENT);
-        UIManager.put("ProgressBar.background",         SURFACE2);
-        UIManager.put("Label.foreground",               TEXT_MAIN);
-        UIManager.put("Component.focusColor",           ACCENT);
-        UIManager.put("Component.borderColor",          BORDER_COLOR);
+        UIManager.put("Panel.background", SURFACE);
+        UIManager.put("RootPane.background", SURFACE);
+        UIManager.put("ScrollPane.background", SURFACE);
+        UIManager.put("Viewport.background", SURFACE);
+        UIManager.put("Table.background", SURFACE2);
+        UIManager.put("Table.alternateRowColor", SURFACE);
+        UIManager.put("Table.selectionBackground", ACCENT_DIM);
+        UIManager.put("Table.selectionForeground", TEXT_MAIN);
+        UIManager.put("TableHeader.background", SURFACE);
+        UIManager.put("TableHeader.foreground", ACCENT);
+        UIManager.put("TextField.background", SURFACE2);
+        UIManager.put("TextField.foreground", TEXT_MAIN);
+        UIManager.put("TextField.caretForeground", ACCENT);
+        UIManager.put("CheckBox.foreground", TEXT_MAIN);
+        UIManager.put("Button.background", SURFACE2);
+        UIManager.put("Button.foreground", TEXT_MAIN);
+        UIManager.put("ProgressBar.foreground", ACCENT);
+        UIManager.put("ProgressBar.background", SURFACE2);
+        UIManager.put("Label.foreground", TEXT_MAIN);
+        UIManager.put("Component.focusColor", ACCENT);
+        UIManager.put("Component.borderColor", BORDER_COLOR);
     }
 
     // ── Constructor ─────────────────────────────────────────────────────────
@@ -99,8 +102,8 @@ public class SwingGui extends JFrame {
         getContentPane().setBackground(SURFACE);
 
         setLayout(new BorderLayout(0, 0));
-        add(buildHeader(),    BorderLayout.NORTH);
-        add(buildMainArea(),  BorderLayout.CENTER);
+        add(buildHeader(), BorderLayout.NORTH);
+        add(buildMainArea(), BorderLayout.CENTER);
         add(buildStatusBar(), BorderLayout.SOUTH);
 
         pack();
@@ -142,25 +145,25 @@ public class SwingGui extends JFrame {
         JPanel main = new JPanel(new GridBagLayout());
         main.setBackground(SURFACE);
         main.setBorder(BorderFactory.createEmptyBorder(12, 12, 8, 12));
-        
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(0, 0, 0, 8);
-        
+
         gbc.gridx = 0;
         gbc.weightx = 0.25;
         main.add(buildStrategiesPanel(), gbc);
-        
+
         gbc.gridx = 1;
         gbc.weightx = 0.4;
         gbc.insets = new Insets(0, 0, 0, 8);
         main.add(buildTournamentPanel(), gbc);
-        
+
         gbc.gridx = 2;
         gbc.weightx = 0.35;
         gbc.insets = new Insets(0, 0, 0, 0);
         main.add(buildResultsPanel(), gbc);
-        
+
         return main;
     }
 
@@ -169,10 +172,10 @@ public class SwingGui extends JFrame {
         JPanel panel = createCard("STRATEGIES");
 
         // Checkboxes - only implemented strategies
-        String[] strategyNames = {
-                "Always Cooperate", "Always Defect", "Tit For Tat", "Tit For Two Tats", "Generous Tit For Tat",
-                "Suspicious Tit For Tat", "Grim Trigger", "Pavlov", "Random"
-        };
+        String[] strategyNames = StrategyRegistry.getStrategies()
+                .stream()
+                .map(Strategy::getName)
+                .toArray(String[]::new);
 
         JPanel listPanel = new JPanel();
         listPanel.setOpaque(false);
@@ -274,32 +277,32 @@ public class SwingGui extends JFrame {
         matrix.setOpaque(false);
         matrix.setMaximumSize(new Dimension(Integer.MAX_VALUE, 110));
         matrix.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+
         rewardField = createMatrixTextField("3");
         temptationField = createMatrixTextField("5");
         punishmentField = createMatrixTextField("1");
         suckerField = createMatrixTextField("0");
-        
+
         JPanel rCell = new JPanel(new BorderLayout(0, 2));
         rCell.setOpaque(false);
         rCell.add(new JLabel("R (Reward)"), BorderLayout.NORTH);
         rCell.add(rewardField, BorderLayout.CENTER);
-        
+
         JPanel tCell = new JPanel(new BorderLayout(0, 2));
         tCell.setOpaque(false);
         tCell.add(new JLabel("T (Temptation)"), BorderLayout.NORTH);
         tCell.add(temptationField, BorderLayout.CENTER);
-        
+
         JPanel pCell = new JPanel(new BorderLayout(0, 2));
         pCell.setOpaque(false);
         pCell.add(new JLabel("P (Punishment)"), BorderLayout.NORTH);
         pCell.add(punishmentField, BorderLayout.CENTER);
-        
+
         JPanel sCell = new JPanel(new BorderLayout(0, 2));
         sCell.setOpaque(false);
         sCell.add(new JLabel("S (Sucker)"), BorderLayout.NORTH);
         sCell.add(suckerField, BorderLayout.CENTER);
-        
+
         matrix.add(rCell);
         matrix.add(tCell);
         matrix.add(pCell);
@@ -315,7 +318,7 @@ public class SwingGui extends JFrame {
         inner.add(modeLabel);
         inner.add(Box.createVerticalStrut(6));
 
-        String[] modes = { "Round Robin", "Ecological (Population)" };
+        String[] modes = {"Round Robin", "Ecological (Population)"};
         JComboBox<String> modeBox = new JComboBox<>(modes);
         modeBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
         modeBox.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -338,6 +341,7 @@ public class SwingGui extends JFrame {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 runBtn.setBackground(ACCENT.brighter());
             }
+
             public void mouseExited(java.awt.event.MouseEvent e) {
                 runBtn.setBackground(ACCENT);
             }
@@ -358,9 +362,12 @@ public class SwingGui extends JFrame {
         JPanel panel = createCard("RESULTS");
 
         // Table
-        String[] cols = { "#", "Strategy", "Score", "Coop %" };
+        String[] cols = {"#", "Strategy", "Score", "Coop %"};
         resultsModel = new DefaultTableModel(cols, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
         };
 
         JTable table = new JTable(resultsModel);
@@ -445,7 +452,9 @@ public class SwingGui extends JFrame {
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
-    /** Creates a titled card panel with BorderLayout. */
+    /**
+     * Creates a titled card panel with BorderLayout.
+     */
     private JPanel createCard(String title) {
         JPanel card = new JPanel(new BorderLayout(0, 8));
         card.setBackground(SURFACE2);
@@ -466,7 +475,9 @@ public class SwingGui extends JFrame {
         return card;
     }
 
-    /** Labelled text field row. */
+    /**
+     * Labelled text field row.
+     */
     private JPanel labeledField(String labelText, String defaultVal) {
         JPanel row = new JPanel(new BorderLayout(8, 0));
         row.setOpaque(false);
@@ -492,7 +503,9 @@ public class SwingGui extends JFrame {
         return row;
     }
 
-    /** Small matrix cell with label above and field below. */
+    /**
+     * Small matrix cell with label above and field below.
+     */
     private JPanel matrixCell(String label, String val) {
         JPanel cell = new JPanel(new BorderLayout(0, 2));
         cell.setOpaque(false);
@@ -555,58 +568,42 @@ public class SwingGui extends JFrame {
         return btn;
     }
 
-    /** Populate results table with placeholder data. */
+    /**
+     * Populate results table with placeholder data.
+     */
     private void populateDemoResults() {
         resultsModel.setRowCount(0);
         Object[][] demo = {
-                { "1", "Tit For Tat",       487, "94%" },
-                { "2", "Always Cooperate",  456, "100%" },
-                { "3", "Pavlov",            423, "78%" },
-                { "4", "Tit For Two Tats",  401, "89%" },
-                { "5", "Grim Trigger",      388, "72%" },
-                { "6", "Random",            312, "50%" },
-                { "7", "Always Defect",     201, "0%"  },
+                {"1", "Tit For Tat", 487, "94%"},
+                {"2", "Always Cooperate", 456, "100%"},
+                {"3", "Pavlov", 423, "78%"},
+                {"4", "Tit For Two Tats", 401, "89%"},
+                {"5", "Grim Trigger", 388, "72%"},
+                {"6", "Random", 312, "50%"},
+                {"7", "Always Defect", 201, "0%"},
         };
         for (Object[] row : demo) resultsModel.addRow(row);
     }
 
-    /** Runs the tournament using the engine. */
+    /**
+     * Runs the tournament using the engine.
+     */
     private void onRunTournament() {
         // Gather selected strategies
         List<Strategy> selectedStrategies = new ArrayList<>();
-        if (strategyCheckboxes.get("Always Cooperate").isSelected()) {
-            selectedStrategies.add(new AlwaysCooporate());
-        }
-        if (strategyCheckboxes.get("Always Defect").isSelected()) {
-            selectedStrategies.add(new AlwaysDefect());
-        }
-        if (strategyCheckboxes.get("Tit For Tat").isSelected()) {
-            selectedStrategies.add(new TitForTat());
-        }
-        if (strategyCheckboxes.get("Generous Tit For Tat").isSelected()) {
-            selectedStrategies.add(new GenerousTitForTat());
-        }
-        if (strategyCheckboxes.get("Tit For Two Tats").isSelected()) {
-            selectedStrategies.add(new TitForTwoTats());
-        }
-        if (strategyCheckboxes.get("Suspicious Tit For Tat").isSelected()) {
-            selectedStrategies.add(new SuspiciousTitForTat());
-        }
-        if (strategyCheckboxes.get("Grim Trigger").isSelected()) {
-            selectedStrategies.add(new GrimTrigger());
-        }
-        if (strategyCheckboxes.get("Pavlov").isSelected()) {
-            selectedStrategies.add(new Pavlov());
-        }
-        if (strategyCheckboxes.get("Random").isSelected()) {
-            selectedStrategies.add(new RandomStrategy());
-        }
+
+        strategyCheckboxes.forEach((name, checkBox) -> {
+                    if (checkBox.isSelected()) {
+                        selectedStrategies.add(StrategyRegistry.getStrategy(name));
+                    }
+                }
+        );
 
         if (selectedStrategies.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Please select at least one strategy.", 
-                "No Strategies Selected", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Please select at least one strategy.",
+                    "No Strategies Selected",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -615,10 +612,10 @@ public class SwingGui extends JFrame {
         try {
             rounds = Integer.parseInt(roundsField.getText());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, 
-                "Invalid number of rounds.", 
-                "Input Error", 
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Invalid number of rounds.",
+                    "Input Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -630,10 +627,10 @@ public class SwingGui extends JFrame {
             p = Integer.parseInt(punishmentField.getText());
             s = Integer.parseInt(suckerField.getText());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, 
-                "Invalid payoff matrix values.", 
-                "Input Error", 
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Invalid payoff matrix values.",
+                    "Input Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -649,54 +646,58 @@ public class SwingGui extends JFrame {
                 Tournament tournament = new Tournament(selectedStrategies, rounds);
                 int totalMatches = selectedStrategies.size() * selectedStrategies.size();
                 int completed = 0;
-                
+
                 tournament.run(matrix);
-                
+
                 completed = totalMatches;
                 publish(100);
-                
+
                 return tournament;
             }
+
             @Override
             protected void process(java.util.List<Integer> chunks) {
                 progressBar.setValue(chunks.getLast());
             }
+
             @Override
             protected void done() {
                 try {
                     Tournament tournament = get();
                     progressBar.setValue(100);
-                    statusLabel.setText("Status: Tournament complete — " + 
-                        selectedStrategies.size() + " strategies, " + rounds + " rounds");
+                    statusLabel.setText("Status: Tournament complete — " +
+                            selectedStrategies.size() + " strategies, " + rounds + " rounds");
                     statusLabel.setForeground(new Color(0x66BB6A));
                     populateResults(tournament);
                 } catch (Exception e) {
                     statusLabel.setText("Status: Error running tournament");
                     statusLabel.setForeground(Color.RED);
                     JOptionPane.showMessageDialog(SwingGui.this,
-                        "Error: " + e.getMessage(),
-                        "Tournament Error",
-                        JOptionPane.ERROR_MESSAGE);
+                            "Error: " + e.getMessage(),
+                            "Tournament Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         };
         worker.execute();
     }
 
-    /** Populates results table with tournament data. */
+    /**
+     * Populates results table with tournament data.
+     */
     private void populateResults(Tournament tournament) {
         resultsModel.setRowCount(0);
         List<Strategy> ranking = tournament.getRanking();
-        
+
         for (int i = 0; i < ranking.size(); i++) {
             Strategy strategy = ranking.get(i);
             double score = tournament.getScore(strategy);
             double coopRate = tournament.getCoopRates().getOrDefault(strategy, 0.0);
             resultsModel.addRow(new Object[]{
-                String.valueOf(i + 1),
-                strategy.getName(),
-                String.format("%.1f", score),
-                String.format("%.0f%%", coopRate * 100)
+                    String.valueOf(i + 1),
+                    strategy.getName(),
+                    String.format("%.1f", score),
+                    String.format("%.0f%%", coopRate * 100)
             });
         }
     }
@@ -707,6 +708,7 @@ public class SwingGui extends JFrame {
             setPreferredSize(new Dimension(28, 28));
             setOpaque(false);
         }
+
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
