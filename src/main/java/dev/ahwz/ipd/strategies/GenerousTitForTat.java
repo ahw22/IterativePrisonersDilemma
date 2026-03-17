@@ -17,7 +17,7 @@ public class GenerousTitForTat implements Strategy {
         }
         if (history.getLastOpponentAction() == Action.COOPERATE) {
             return Action.COOPERATE;
-        } else if (Math.random() < 0.1) {
+        } else if (Math.random() < 0.33) {
             return Action.COOPERATE;
         } else {
             return Action.DEFECT;
