@@ -44,6 +44,8 @@ public class SwingGui extends JFrame {
     private JLabel statusLabel;
     private JProgressBar progressBar;
     private DefaultTableModel resultsModel;
+    private JButton viewDataButton;
+    private Tournament lastTournament;
 
     // Strategy checkboxes (name -> checkbox)
     private final java.util.Map<String, JCheckBox> strategyCheckboxes = new java.util.LinkedHashMap<>();
@@ -411,8 +413,18 @@ public class SwingGui extends JFrame {
         chartPlaceholder.add(chartHint, BorderLayout.CENTER);
         south.add(chartPlaceholder);
 
+        JPanel buttonRow = new JPanel(new GridLayout(1, 2, 6, 0));
+        buttonRow.setOpaque(false);
+
+        JButton viewDataBtn = accentButton("📊  View Data");
+        viewDataBtn.addActionListener(e -> onViewData());
+        viewDataBtn.setEnabled(false);
+        viewDataButton = viewDataBtn;
+        buttonRow.add(viewDataBtn);
+
         JButton exportBtn = mutedButton("⬇  Export CSV");
-        south.add(exportBtn);
+        buttonRow.add(exportBtn);
+        south.add(buttonRow);
 
         panel.add(south, BorderLayout.SOUTH);
         return panel;
@@ -696,6 +708,7 @@ public class SwingGui extends JFrame {
      * Populates results table with tournament data.
      */
     private void populateResults(Tournament tournament) {
+        this.lastTournament = tournament;
         resultsModel.setRowCount(0);
         List<Strategy> ranking = tournament.getRanking();
 
@@ -709,6 +722,20 @@ public class SwingGui extends JFrame {
                     String.format("%.1f", score),
                     String.format("%.0f%%", coopRate * 100)
             });
+        }
+
+        if (viewDataButton != null) {
+            viewDataButton.setEnabled(true);
+        }
+    }
+
+    /**
+     * Opens the Data View window.
+     */
+    private void onViewData() {
+        if (lastTournament != null) {
+            DataViewWindow window = new DataViewWindow(lastTournament);
+            window.setVisible(true);
         }
     }
 
