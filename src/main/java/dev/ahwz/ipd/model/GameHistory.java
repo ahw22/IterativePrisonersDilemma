@@ -1,13 +1,11 @@
 package dev.ahwz.ipd.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
-@Getter
 public class GameHistory {
     private List<Action> playerActions;
     private List<Action> opponentActions;
@@ -22,18 +20,22 @@ public class GameHistory {
     public Action getLastOpponentAction() {
         return opponentActions.getLast();
     }
+
     public Action getLastPlayerAction() {
         return playerActions.getLast();
     }
+
     public boolean isFirstMove() {
         return playerActions.isEmpty();
     }
+
     public boolean isLastMove() {
         return playerActions.size() == rounds - 1;
     }
 
     /**
      * Returns n to last player action. If n is larger than number of actions returns null
+     *
      * @param n distance to last action
      * @return Action or null
      */
@@ -41,8 +43,10 @@ public class GameHistory {
         if (n > playerActions.size()) return null;
         return playerActions.get(playerActions.size() - n);
     }
+
     /**
      * Returns n to last opponent action. If n is larger than number of actions returns null
+     *
      * @param n distance to last action
      * @return Action or null
      */
@@ -57,4 +61,15 @@ public class GameHistory {
     }
 
 
+    public List<Action> getPlayerActions() {
+        return this.playerActions;
+    }
+
+    public List<Action> getOpponentActions() {
+        return this.opponentActions;
+    }
+
+    public int getRounds() {
+        return this.rounds;
+    }
 }

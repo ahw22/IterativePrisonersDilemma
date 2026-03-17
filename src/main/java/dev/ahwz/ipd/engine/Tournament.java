@@ -3,14 +3,12 @@ package dev.ahwz.ipd.engine;
 import dev.ahwz.ipd.model.MatchResult;
 import dev.ahwz.ipd.model.PayoffMatrix;
 import dev.ahwz.ipd.model.Strategy;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Getter
 public class Tournament {
     private final List<Strategy> strategies;
     private final Map<Strategy, Double> totalScores;
@@ -97,7 +95,41 @@ public class Tournament {
                 .toList();
     }
 
-    public double getCoopRate(Strategy strategy) {return coopRates.get(strategy); }
+    public double getCoopRate(Strategy strategy) {
+        return coopRates.get(strategy);
+    }
 
+    public List<MatchResult> getMatchesForStrategy(Strategy strategy) {
+        return matchResults.stream()
+                .filter(mr -> mr.playerA().equals(strategy) || mr.playerB().equals(strategy))
+                .toList();
+    }
 
+    public List<Strategy> getStrategies() {
+        return this.strategies;
+    }
+
+    public Map<Strategy, Double> getTotalScores() {
+        return this.totalScores;
+    }
+
+    public Map<Strategy, Double> getCoopRates() {
+        return this.coopRates;
+    }
+
+    public List<MatchResult> getMatchResults() {
+        return this.matchResults;
+    }
+
+    public List<Strategy> getRanking() {
+        return this.ranking;
+    }
+
+    public int getRounds() {
+        return this.rounds;
+    }
+
+    public double getNoise() {
+        return this.noise;
+    }
 }
