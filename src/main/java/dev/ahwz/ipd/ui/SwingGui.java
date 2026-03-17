@@ -8,10 +8,13 @@ import dev.ahwz.ipd.model.PayoffMatrix;
 import dev.ahwz.ipd.model.Strategy;
 import dev.ahwz.ipd.registry.StrategyRegistry;
 import dev.ahwz.ipd.strategies.*;
+import dev.ahwz.ipd.util.TournamentCsvExporter;
 
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +48,7 @@ public class SwingGui extends JFrame {
     private JProgressBar progressBar;
     private DefaultTableModel resultsModel;
     private JButton viewDataButton;
+    private JButton exportButton;
     private Tournament lastTournament;
 
     // Strategy checkboxes (name -> checkbox)
@@ -423,6 +427,9 @@ public class SwingGui extends JFrame {
         buttonRow.add(viewDataBtn);
 
         JButton exportBtn = mutedButton("⬇  Export CSV");
+        exportBtn.addActionListener(e -> onExportCsv());
+        exportBtn.setEnabled(false);
+        exportButton = exportBtn;
         buttonRow.add(exportBtn);
         south.add(buttonRow);
 
@@ -727,6 +734,9 @@ public class SwingGui extends JFrame {
         if (viewDataButton != null) {
             viewDataButton.setEnabled(true);
         }
+        if (exportButton != null) {
+            exportButton.setEnabled(true);
+        }
     }
 
     /**
@@ -736,6 +746,27 @@ public class SwingGui extends JFrame {
         if (lastTournament != null) {
             DataViewWindow window = new DataViewWindow(lastTournament);
             window.setVisible(true);
+        }
+    }
+
+    private void onExportCsv() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select Export Location");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setApproveButtonText("Export");
+
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            Path outputDir = fileChooser.getSelectedFile().toPath();
+            try {
+                TournamentCsvExporter.exportTournament(lastTournament, outputDir);
+                statusLabel.setText("Status: Exported to " + outputDir.toAbsolutePath());
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "Failed to export CSV: " + ex.getMessage(),
+                        "Export Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 

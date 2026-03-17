@@ -15,19 +15,23 @@ public class TournamentCsvExporter {
     private static final Path OUTPUT_FOLDER = Path.of("outputData");
     private static final Path MATCH_FOLDER = OUTPUT_FOLDER.resolve("matches");
 
-    public static void exportTournament(Tournament tournament) throws IOException {
+    public static void exportTournament(Tournament tournament, Path outputDir) throws IOException {
+        Files.createDirectories(outputDir);
+        Path matchFolder = outputDir.resolve("matches");
+        Files.createDirectories(matchFolder);
 
-        Files.createDirectories(OUTPUT_FOLDER);
-        Files.createDirectories(MATCH_FOLDER);
-
-        exportAverageScores(tournament);
-        exportMatches(tournament);
-        exportIndividualMatches(tournament);
+        exportAverageScores(tournament, outputDir);
+        exportMatches(tournament, outputDir);
+        exportIndividualMatches(tournament, matchFolder);
     }
 
-    private static void exportAverageScores(Tournament tournament) throws IOException {
+    public static void exportTournament(Tournament tournament) throws IOException {
+        exportTournament(tournament, OUTPUT_FOLDER);
+    }
 
-        Path file = OUTPUT_FOLDER.resolve("average_scores.csv");
+    private static void exportAverageScores(Tournament tournament, Path outputFolder) throws IOException {
+
+        Path file = outputFolder.resolve("average_scores.csv");
 
         try (BufferedWriter writer = Files.newBufferedWriter(file)) {
 
@@ -48,9 +52,9 @@ public class TournamentCsvExporter {
         }
     }
 
-    private static void exportMatches(Tournament tournament) throws IOException {
+    private static void exportMatches(Tournament tournament, Path outputFolder) throws IOException {
 
-        Path file = OUTPUT_FOLDER.resolve("matches.csv");
+        Path file = outputFolder.resolve("matches.csv");
 
         try (BufferedWriter writer = Files.newBufferedWriter(file)) {
 
@@ -72,7 +76,7 @@ public class TournamentCsvExporter {
         }
     }
 
-    private static void exportIndividualMatches(Tournament tournament) throws IOException {
+    private static void exportIndividualMatches(Tournament tournament, Path matchFolder) throws IOException {
 
         for (MatchResult match : tournament.getMatchResults()) {
 
@@ -80,7 +84,7 @@ public class TournamentCsvExporter {
                     match.playerA().getName() + "_" +
                             match.playerB().getName() + ".csv";
 
-            Path file = MATCH_FOLDER.resolve(fileName);
+            Path file = matchFolder.resolve(fileName);
 
             try (BufferedWriter writer = Files.newBufferedWriter(file)) {
 
