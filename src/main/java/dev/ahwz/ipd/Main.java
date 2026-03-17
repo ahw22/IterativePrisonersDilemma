@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) {
         List<Strategy> strategies = StrategyRegistry.getStrategies();
         PayoffMatrix matrix = new PayoffMatrix(3, 5, 1, 0);
-        Tournament tournament = new Tournament(strategies, 200, 0.05);
+        Tournament tournament = new Tournament(strategies, 200, 0.01);
 
         tournament.run(matrix);
 
