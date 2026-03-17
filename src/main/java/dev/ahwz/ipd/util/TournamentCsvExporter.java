@@ -74,20 +74,17 @@ public class TournamentCsvExporter {
 
     private static void exportIndividualMatches(Tournament tournament) throws IOException {
 
-        int matchIndex = 1;
-
         for (MatchResult match : tournament.getMatchResults()) {
 
             String fileName =
                     match.playerA().getName() + "_" +
-                            match.playerB().getName() + "_" +
-                            matchIndex + ".csv";
+                            match.playerB().getName() + ".csv";
 
             Path file = MATCH_FOLDER.resolve(fileName);
 
             try (BufferedWriter writer = Files.newBufferedWriter(file)) {
 
-                writer.write("Round,MoveA,MoveB,PayoffA,PayoffB,NoiseA,NoiseB");
+                writer.write("Round,"+ match.playerA().getName() + "," + match.playerB().getName() + ",PayoffA,PayoffB,NoiseA,NoiseB");
                 writer.newLine();
 
                 int round = 1;
@@ -111,8 +108,6 @@ public class TournamentCsvExporter {
                 writer.newLine();
                 writer.write("CoopRates:," + match.coopRateA() + "," + match.coopRateB());
             }
-
-            matchIndex++;
         }
     }
 }
