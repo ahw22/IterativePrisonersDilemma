@@ -18,10 +18,12 @@ public class Tournament {
     private final List<MatchResult> matchResults;
     private final List<Strategy> ranking;
     private final int rounds;
+    private final double noise;
 
-    public Tournament(List<Strategy> strategies, int rounds) {
+    public Tournament(List<Strategy> strategies, int rounds, double noise) {
         this.strategies = strategies;
         this.rounds = rounds;
+        this.noise = noise;
         totalScores = new HashMap<>();
         coopRates = new HashMap<>();
         matchResults = new ArrayList<>();
@@ -32,7 +34,7 @@ public class Tournament {
         for (Strategy sA : strategies) {
             for (Strategy sB : strategies) {
                 Match match = new Match();
-                MatchResult result = match.play(sA, sB, rounds, matrix);
+                MatchResult result = match.play(sA, sB, rounds, matrix, noise);
                 matchResults.add(result);
             }
         }

@@ -633,6 +633,16 @@ public class SwingGui extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
+        double noise;
+        try {
+            noise = Double.parseDouble(noiseField.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Invalid noise value.",
+                    "Input Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         PayoffMatrix matrix = new PayoffMatrix(r, t, p, s);
 
@@ -643,7 +653,7 @@ public class SwingGui extends JFrame {
         SwingWorker<Tournament, Integer> worker = new SwingWorker<>() {
             @Override
             protected Tournament doInBackground() throws Exception {
-                Tournament tournament = new Tournament(selectedStrategies, rounds);
+                Tournament tournament = new Tournament(selectedStrategies, rounds, noise);
                 int totalMatches = selectedStrategies.size() * selectedStrategies.size();
                 int completed = 0;
 

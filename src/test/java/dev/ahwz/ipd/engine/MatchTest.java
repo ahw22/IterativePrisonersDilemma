@@ -16,7 +16,7 @@ class MatchTest {
         PayoffMatrix matrix = new PayoffMatrix(3,5,1,0);
 
         Match match = new Match();
-        MatchResult result = match.play(playerA, playerB, 10, matrix);
+        MatchResult result = match.play(playerA, playerB, 10, matrix, 0.00);
         System.out.println(result);
     }
 

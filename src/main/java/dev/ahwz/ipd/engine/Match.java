@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Match {
 
-    public MatchResult play(Strategy playerA, Strategy playerB, int rounds, PayoffMatrix payoffMatrix) {
+    public MatchResult play(Strategy playerA, Strategy playerB, int rounds, PayoffMatrix payoffMatrix, double noise) {
         GameHistory historyA = new GameHistory(rounds);
         GameHistory historyB = new GameHistory(rounds);
         List<RoundResult> roundResults = new ArrayList<>();
@@ -16,10 +16,23 @@ public class Match {
             Action moveA = playerA.getAction(historyA);
             Action moveB = playerB.getAction(historyB);
 
-            historyA.recordMove(moveA, moveB);
-            historyB.recordMove(moveB, moveA);
+            boolean noisyA, noisyB;
+            if (applyNoise(noise)) {
+                noisyA = true;
+                historyA.recordMove(moveA, moveB.opposite());
+            } else {
+                noisyA = false;
+                historyA.recordMove(moveA, moveB);
+            }
+            if (applyNoise(noise)) {
+                noisyB = true;
+                historyB.recordMove(moveB, moveA.opposite());
+            } else {
+                noisyB = false;
+                historyB.recordMove(moveB, moveA);
+            }
 
-            roundResults.add(new RoundResult(moveA, moveB, payoffMatrix.payoff(moveA,moveB), payoffMatrix.payoff(moveB,moveA)));
+            roundResults.add(new RoundResult(moveA, moveB, payoffMatrix.payoff(moveA,moveB), payoffMatrix.payoff(moveB,moveA), noisyA, noisyB));
         }
         int numOfCooporationsA = 0;
         int numOfCooporationsB = 0;
@@ -50,4 +63,9 @@ public class Match {
         return new MatchResult(playerA, playerB, roundResults.stream().mapToInt(RoundResult::payoffA).sum(), roundResults.stream().mapToInt(
                 RoundResult::payoffB).sum(), rounds, roundResults, coopRateA, coopRateB);
     }
+
+    private boolean applyNoise(double noise) {
+        return Math.random() < noise;
+    }
+
 }

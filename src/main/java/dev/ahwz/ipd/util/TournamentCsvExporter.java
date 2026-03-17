@@ -87,7 +87,7 @@ public class TournamentCsvExporter {
 
             try (BufferedWriter writer = Files.newBufferedWriter(file)) {
 
-                writer.write("Round,MoveA,MoveB,PayoffA,PayoffB");
+                writer.write("Round,MoveA,MoveB,PayoffA,PayoffB,NoiseA,NoiseB");
                 writer.newLine();
 
                 int round = 1;
@@ -99,7 +99,9 @@ public class TournamentCsvExporter {
                                     roundResult.moveA() + "," +
                                     roundResult.moveB() + "," +
                                     roundResult.payoffA() + "," +
-                                    roundResult.payoffB()
+                                    roundResult.payoffB() + "," +
+                                    roundResult.noisyA() + "," +
+                                    roundResult.noisyB()
                     );
 
                     writer.newLine();
