@@ -120,7 +120,7 @@ cd IterativePrisonersDilemma
 mvn clean package
 
 # Run the application
-mvn exec:java -Dexec.mainClass="dev.ahwz.ipd.Main"
+mvn exec:java -Dexec.mainClass="dev.ahwz.ipd.ui.SwingGui"
 ```
 
 ### Run Tests
