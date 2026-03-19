@@ -10,7 +10,7 @@ A JavaFX desktop application for simulating Robert Axelrod's famous Iterated Pri
 
 ## About
 
-This is a **practice project** built to learn JavaFX while exploring game theory concepts. The Iterated Prisoner's Dilemma is a classic model for understanding how cooperation emerges between self-interested agents.
+This is a work in progress **practice project** built to learn JavaFX while exploring game theory concepts. The Iterated Prisoner's Dilemma is a classic model for understanding how cooperation emerges between self-interested agents.
 
 ---
 
@@ -128,18 +128,6 @@ mvn exec:java -Dexec.mainClass="dev.ahwz.ipd.ui.SwingGui"
 ```bash
 mvn test
 ```
-
----
-
-## The Key Insight: Why Tit For Tat Wins
-
-Axelrod's tournaments revealed what makes a successful strategy:
-
-1. **Nice** - Never defect first
-2. **Retaliatory** - Always punish defection immediately  
-3. **Forgiving** - Recover cooperation quickly after retaliation
-
-Tit For Tat embodies all three. Its simplicity also makes it *clear* to opponents, enabling mutual cooperation.
 
 ---
 
