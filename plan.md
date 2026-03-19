@@ -22,36 +22,8 @@ A JavaFX desktop application that simulates Robert Axelrod's famous tournaments 
    - Cooperation rate statistics
    - Pairwise match results
 
-4. **Advanced Features**
-   - Strategy performance heatmaps
-   - Export results to CSV/JSON
-
----
-
-# Future Additions
-
-## Noise
-Simulates mistakes or miscommunications where a move is randomly flipped:
-- Configurable probability (0-100%)
-- Applied independently to each player's move
-- Low noise (1-5%): Tit For Tat still performs well
-- High noise (>10%): Generous strategies outperform
-
-## Evolutionary Tournament
-Simulates population dynamics over generations:
-- Initial population with equal representation
-- Each generation plays round-robin
-- Reproduction proportional to score
-- Track population share over time
-- Visualize with line chart
-
-## Custom Strategy Builder
-GUI-based strategy creation:
-- Select first move (Cooperate/Defect/Random)
-- Configure response to opponent cooperation
-- Configure response to opponent defection
-- Set retaliation thresholds
-- Test against built-in strategies
+4. **Export**
+   - Export results to CSV
 
 ---
 
@@ -123,13 +95,6 @@ Contains results of an entire tournament:
 | **Grim Trigger** | Cooperates until opponent defects, then defects forever |
 | **Pavlov (Win-Stay, Lose-Shift)** | Repeats last move after reward/temptation, switches after punishment/sucker |
 
-## 3.4 Custom Strategy Builder
-A UI-based tool allowing users to create strategies without coding:
-- First move preference
-- Response to opponent defection
-- Response to opponent cooperation
-- Retaliation threshold
-
 ---
 
 # 4. Game Engine
@@ -159,67 +124,93 @@ Key responsibilities:
 
 ---
 
-# 5. JavaFX UI Architecture
+# 5. Roadmap
 
-## 5.1 Project Structure
+## 5.1 New Strategies
+
+Additional strategies to implement:
+
+| Strategy | Category | Behavior |
+|----------|----------|----------|
+| **Adaptive Tit For Tat** | Reciprocal | Adjusts cooperation based on recent opponent behavior |
+| **Downing** | Reciprocal | Attempts to model opponent's strategy |
+| **Prober** | Exploitative | Tests if opponent is firm, then exploits |
+| **Resurrected Prober** | Exploitative | Prober variant with recovery mechanism |
+| **Soft Majoritarian** | Trigger | Defects if opponent defects too often |
+| **Nydegger** | Reciprocal | Uses memory of specific move sequences |
+| **Grofman** | Reciprocal | Groups moves into categories, cooperates more often |
+| **Shubik** | Punisher | Counts defections, punishes proportionally |
+| **Friedman** | Trigger | Like Grim Trigger but with limited retaliation |
+| **Davis** | Trigger | Cooperates initially, then defects if provoked |
+| **Graaskamp** | Reactive | Responds to defection patterns |
+| **Tullock** | Exploitative | Initial defections to test opponent |
+| **Eatherly** | Trigger | Like Grim Trigger but with occasional forgiveness |
+| **Colet** | Reactive | Similar to TFT with probabilistic elements |
+| **Reverse Tit For Tat** | Reciprocal | Defects first, then cooperates |
+| **Betting** | Exploitative | Alternates strategies based on score |
+
+## 5.2 Custom Strategy Builder
+
+GUI-based tool for creating strategies without coding:
+
+- Select first move (Cooperate/Defect/Random)
+- Configure response to opponent cooperation
+- Configure response to opponent defection
+- Set retaliation thresholds
+- Test against built-in strategies
+
+## 5.3 Evolutionary Tournament
+
+Simulates population dynamics over generations:
+
+- Initial population with equal representation
+- Each generation plays round-robin
+- Reproduction proportional to score
+- Track population share over time
+- Visualize with line chart
+
+## 5.4 Pairwise Heatmap Visualization
+
+Grid showing scores between each pair of strategies:
+
+- Color-coded cells for quick comparison
+- Useful for understanding direct matchups
+- Identify exploitable strategies
+
+---
+
+# 6. JavaFX UI Architecture
+
+## 6.1 Project Structure
 
 ```
-src/main/java/com/axelrod/
+src/main/java/dev/ahwz/ipd/
 ├── Main.java                    # Application entry point
 ├── model/                       # Domain classes
 │   ├── Action.java
 │   ├── Strategy.java
 │   ├── GameHistory.java
 │   ├── PayoffMatrix.java
-│   ├── MatchResult.java
-│   └── TournamentResult.java
+│   └── MatchResult.java
 ├── strategies/                  # Built-in strategy implementations
 ├── engine/                      # Game and tournament engines
-├── ui/                          # Controllers and views
-│   ├── MainController.java
+│   ├── Match.java
+│   └── Tournament.java
+├── ui/                          # Swing UI components
 │   └── ...
-├── view/                        # FXML layout files
-│   └── MainView.fxml
 └── util/                        # Utilities (export, etc.)
 ```
 
-## 5.2 Main Window Layout
+## 6.2 Main Window Layout
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  [Logo] Iterative Prisoner's Dilemma Simulator         [−][□][×]  │
-├─────────────────────────────────────────────────────────────────────┤
-│  ┌─────────────────┐  ┌─────────────────────┐  ┌───────────────┐   │
-│  │   STRATEGIES    │  │   TOURNAMENT SETUP  │  │    RESULTS    │   │
-│  │                 │  │                     │  │               │   │
-│  │  ☑ Always C     │  │  Rounds: [200    ]   │  │  Rank Strategy│   │
-│  │  ☑ Always D     │  │                     │  │   1. TFT   487│   │
-│  │  ☑ Tit For Tat  │  │  Payoff Matrix:     │  │   2. AlwaysC 456│  │
-│  │  ☑ Random       │  │  R:[3] T:[5] P:[1] S:[0]  │   3. Pavlov 423│  │
-│  │                 │  │                     │  │   4. Random  312│  │
-│  │                 │  │                     │  │               │   │
-│  │                 │  │  [▶ Run Tournament]  │  │  [Chart]      │   │
-│  │                 │  │                     │  │               │   │
-│  └─────────────────┘  └─────────────────────┘  └───────────────┘   │
-├─────────────────────────────────────────────────────────────────────┤
-│  Status: Ready                                    Progress: ░░░░   │
-└─────────────────────────────────────────────────────────────────────┘
-```
+![Main Tournament GUI](screenshots/tournamentGUI.png)
 
-**Left Panel - Strategy Selection:**
-- Checkbox list of available strategies
+**Panel Layout:**
+- **Left** - Strategy selection (checkbox list)
+- **Center** - Tournament settings (rounds, payoff matrix)
+- **Right** - Results (rankings, scores)
 
-**Center Panel - Tournament Settings:**
-- Rounds per match (default 200)
-- Payoff matrix configuration (R, T, P, S values)
-- Run Tournament button
-
-**Right Panel - Results:**
-- Ranking table with strategy name and score
-- Bar chart visualization
-- Export button
-
-## 5.3 Controller Design
+## 6.3 Controller Design
 
 **MainController:**
 - Manages overall application state
@@ -227,30 +218,20 @@ src/main/java/com/axelrod/
 - Runs tournament in background thread
 - Updates progress bar and status label
 
-**StrategyListController:**
-- Populates strategy list from available implementations
-- Handles selection state
-- Manages add/remove operations
-
-**ResultsController:**
-- Updates table with tournament results
-- Renders charts
-- Handles sorting and filtering
-
 ---
 
-# 6. Visualization Features
+# 7. Visualization Features
 
-## 6.1 Score Bar Chart
+## 7.1 Score Bar Chart
 Horizontal or vertical bar chart showing total scores for each strategy, sorted by rank.
 
-## 6.2 Cooperation Rate Display
+## 7.2 Cooperation Rate Display
 Shows what percentage of each strategy's moves were cooperative, helpful for understanding strategy behavior.
 
-## 6.3 Pairwise Heatmap
+## 7.3 Pairwise Heatmap
 Grid showing scores between each pair of strategies. Useful for understanding direct matchups.
 
-## 6.4 Match Details
+## 7.4 Match Details
 When clicking a result, show:
 - All moves made in sequence
 - Score progression over rounds
@@ -258,7 +239,7 @@ When clicking a result, show:
 
 ---
 
-# 7. Export Options
+# 8. Export Options
 
 - **CSV**: Strategy, Score, Cooperation Rate
 - **JSON**: Full tournament data with match details
@@ -266,22 +247,22 @@ When clicking a result, show:
 
 ---
 
-# 8. Development Phases
+# 9. Development Phases
 
-## Phase 1: Core Simulation (Week 1)
+## Phase 1: Core Simulation
 
 | Task | Description |
 |------|-------------|
-| Create project structure | Maven/Gradle, JavaFX setup |
+| Create project structure | Maven setup, Java |
 | Implement domain model | Action, Strategy, GameHistory, etc. |
-| Implement 3-4 basic strategies | AlwaysC, AlwaysD, TFT, Random |
+| Implement basic strategies | AlwaysC, AlwaysD, TFT, Random |
 | Implement Match engine | Single match execution |
 | Implement Tournament engine | Round-robin execution |
 | Console testing | Verify tournament runs correctly |
 
 **Deliverable:** Command-line tournament runner
 
-## Phase 2: JavaFX UI (Week 2)
+## Phase 2: JavaFX UI
 
 | Task | Description |
 |------|-------------|
@@ -294,18 +275,18 @@ When clicking a result, show:
 
 **Deliverable:** Functional desktop app with basic UI
 
-## Phase 3: Visualization (Week 3)
+## Phase 3: Visualization
 
 | Task | Description |
 |------|-------------|
-| Score bar chart | JavaFX BarChart integration |
+| Score bar chart | Chart integration |
 | Cooperation rate display | Add column to results table |
 | Heatmap view | Grid showing pairwise results |
 | Match detail view | Click to see individual match data |
 
 **Deliverable:** Visual analysis tools
 
-## Phase 4: Polish & Export (Week 4)
+## Phase 4: Polish & Export
 
 | Task | Description |
 |------|-------------|
@@ -316,7 +297,7 @@ When clicking a result, show:
 
 ---
 
-# 9. Testing Plan
+# 10. Testing Plan
 
 ## Unit Tests
 Test individual strategies and components:
@@ -339,7 +320,7 @@ Test component interactions:
 
 ---
 
-# 10. Key Insights from Axelrod's Research
+# 11. Key Insights from Axelrod's Research
 
 1. **Tit For Tat wins consistently** - Its success comes from being nice, retaliatory, and forgiving.
 

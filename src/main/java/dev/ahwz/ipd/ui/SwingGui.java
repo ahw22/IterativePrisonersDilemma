@@ -206,14 +206,6 @@ public class SwingGui extends JFrame {
         scroll.getViewport().setBackground(SURFACE2);
         panel.add(scroll, BorderLayout.CENTER);
 
-        // Buttons
-        JPanel btnRow = new JPanel(new GridLayout(1, 2, 6, 0));
-        btnRow.setOpaque(false);
-        btnRow.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
-        btnRow.add(accentButton("+ Add Custom"));
-        btnRow.add(mutedButton("Remove"));
-        panel.add(btnRow, BorderLayout.SOUTH);
-
         return panel;
     }
 
