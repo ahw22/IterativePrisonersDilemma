@@ -50,6 +50,10 @@ public class SwingGui extends JFrame {
     private JButton viewDataButton;
     private JButton exportButton;
     private Tournament lastTournament;
+    private javax.swing.Timer elapsedTimer;
+    private long startTime;
+    private int totalRounds;
+    private volatile int completedRounds;
 
     // Strategy checkboxes (name -> checkbox)
     private final java.util.Map<String, JCheckBox> strategyCheckboxes = new java.util.LinkedHashMap<>();
@@ -657,6 +661,18 @@ public class SwingGui extends JFrame {
 
         PayoffMatrix matrix = new PayoffMatrix(r, t, p, s);
 
+        totalRounds = selectedStrategies.size() * selectedStrategies.size() * rounds;
+        completedRounds = 0;
+        startTime = System.currentTimeMillis();
+
+        elapsedTimer = new javax.swing.Timer(100, e -> {
+            long elapsed = System.currentTimeMillis() - startTime;
+            int currentProgress = progressBar.getValue();
+            statusLabel.setText(String.format("Status: Running... %s (%d%%, %,d / %,d rounds)",
+                    formatElapsedTime(elapsed), currentProgress, completedRounds, totalRounds));
+        });
+        elapsedTimer.start();
+
         statusLabel.setText("Status: Running tournament...");
         statusLabel.setForeground(ACCENT);
         progressBar.setValue(0);
@@ -665,13 +681,11 @@ public class SwingGui extends JFrame {
             @Override
             protected Tournament doInBackground() throws Exception {
                 Tournament tournament = new Tournament(selectedStrategies, rounds, noise);
-                int totalMatches = selectedStrategies.size() * selectedStrategies.size();
-                int completed = 0;
 
-                tournament.run(matrix);
-
-                completed = totalMatches;
-                publish(100);
+                tournament.run(matrix, progress -> {
+                    completedRounds = (progress * totalRounds) / 100;
+                    publish(progress);
+                });
 
                 return tournament;
             }
@@ -684,13 +698,16 @@ public class SwingGui extends JFrame {
             @Override
             protected void done() {
                 try {
+                    elapsedTimer.stop();
                     Tournament tournament = get();
                     progressBar.setValue(100);
-                    statusLabel.setText("Status: Tournament complete — " +
-                            selectedStrategies.size() + " strategies, " + rounds + " rounds");
+                    long elapsed = System.currentTimeMillis() - startTime;
+                    statusLabel.setText(String.format("Status: Complete — %s, %d strategies, %,d rounds",
+                            formatElapsedTime(elapsed), selectedStrategies.size(), rounds));
                     statusLabel.setForeground(new Color(0x66BB6A));
                     populateResults(tournament);
                 } catch (Exception e) {
+                    elapsedTimer.stop();
                     statusLabel.setText("Status: Error running tournament");
                     statusLabel.setForeground(Color.RED);
                     JOptionPane.showMessageDialog(SwingGui.this,
@@ -701,6 +718,20 @@ public class SwingGui extends JFrame {
             }
         };
         worker.execute();
+    }
+
+    private String formatElapsedTime(long millis) {
+        long ms = millis % 1000;
+        long seconds = (millis / 1000) % 60;
+        long minutes = millis / 60000;
+
+        if (minutes > 0) {
+            return String.format("%dm %ds %dms", minutes, seconds, ms);
+        } else if (seconds > 0) {
+            return String.format("%ds %dms", seconds, ms);
+        } else {
+            return String.format("%dms", ms);
+        }
     }
 
     /**

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntConsumer;
 
 public class Tournament {
     private final List<Strategy> strategies;
@@ -34,6 +35,31 @@ public class Tournament {
                 Match match = new Match();
                 MatchResult result = match.play(sA, sB, rounds, matrix, noise);
                 matchResults.add(result);
+            }
+        }
+        calculateScores();
+
+        List<Strategy> desc = totalScores.entrySet().stream()
+                .sorted(Map.Entry.<Strategy, Double>comparingByValue().reversed())
+                .map(Map.Entry::getKey)
+                .toList();
+
+        ranking.addAll(desc);
+    }
+
+    public void run(PayoffMatrix matrix, IntConsumer progressCallback) {
+        int totalRounds = strategies.size() * strategies.size() * rounds;
+        int completedRounds = 0;
+
+        for (Strategy sA : strategies) {
+            for (Strategy sB : strategies) {
+                Match match = new Match();
+                MatchResult result = match.play(sA, sB, rounds, matrix, noise);
+                matchResults.add(result);
+
+                completedRounds += rounds;
+                int progress = (int) ((completedRounds * 100.0) / totalRounds);
+                progressCallback.accept(progress);
             }
         }
         calculateScores();
