@@ -21,4 +21,7 @@ public class RandomStrategy implements Strategy {
     public Action getAction(GameHistory history) {
        return (Math.random() < randomness) ? Action.COOPERATE : Action.DEFECT;
     }
+
+    @Override
+    public void reset() {}
 }

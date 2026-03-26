@@ -24,4 +24,7 @@ public class TitForTwoTats implements Strategy {
             return Action.COOPERATE;
         }
     }
+
+    @Override
+    public void reset() {}
 }

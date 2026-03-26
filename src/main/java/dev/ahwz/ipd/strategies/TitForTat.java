@@ -22,4 +22,7 @@ public class TitForTat implements Strategy {
             return Action.DEFECT;
         }
     }
+
+    @Override
+    public void reset() {}
 }

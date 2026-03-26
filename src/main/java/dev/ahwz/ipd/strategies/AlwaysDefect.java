@@ -14,4 +14,7 @@ public class AlwaysDefect implements Strategy {
     public Action getAction(GameHistory history) {
         return Action.DEFECT;
     }
+
+    @Override
+    public void reset() {}
 }

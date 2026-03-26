@@ -21,4 +21,7 @@ public class SuspiciousTitForTat implements Strategy {
             return Action.DEFECT;
         }
     }
+
+    @Override
+    public void reset() {}
 }

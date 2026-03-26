@@ -22,6 +22,9 @@ public class Pavlov implements Strategy {
         }
     }
 
+    @Override
+    public void reset() {}
+
     private boolean wonLastRound(GameHistory history) {
         Action lastPlayerAction = history.getLastPlayerAction();
         Action lastOpponentAction = history.getLastOpponentAction();

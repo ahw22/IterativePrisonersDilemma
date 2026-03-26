@@ -23,4 +23,7 @@ public class GenerousTitForTat implements Strategy {
             return Action.DEFECT;
         }
     }
+
+    @Override
+    public void reset() {}
 }

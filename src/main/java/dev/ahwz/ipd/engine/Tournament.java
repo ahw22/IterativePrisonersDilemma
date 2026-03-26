@@ -56,6 +56,8 @@ public class Tournament {
                 Match match = new Match();
                 MatchResult result = match.play(sA, sB, rounds, matrix, noise);
                 matchResults.add(result);
+                sA.reset();
+                sB.reset();
 
                 completedRounds += rounds;
                 int progress = (int) ((completedRounds * 100.0) / totalRounds);

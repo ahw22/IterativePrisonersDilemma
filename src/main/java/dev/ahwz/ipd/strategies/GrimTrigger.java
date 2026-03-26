@@ -21,4 +21,7 @@ public class GrimTrigger implements Strategy {
             return Action.COOPERATE;
         }
     }
+
+    @Override
+    public void reset() {}
 }

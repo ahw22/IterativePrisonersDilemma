@@ -15,4 +15,7 @@ public class AlwaysCooporate implements Strategy {
     public Action getAction(GameHistory history) {
         return Action.COOPERATE;
     }
+
+    @Override
+    public void reset() {}
 }

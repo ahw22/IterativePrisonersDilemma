@@ -37,4 +37,10 @@ public class GradualTitForTat implements Strategy {
             }
         }
     }
+
+    @Override
+    public void reset() {
+        defectionCount = 0;
+        cooperationCount = 0;
+    }
 }
