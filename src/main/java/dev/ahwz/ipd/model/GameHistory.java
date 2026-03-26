@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @AllArgsConstructor
 public class GameHistory {
@@ -18,11 +19,19 @@ public class GameHistory {
     }
 
     public Action getLastOpponentAction() {
-        return opponentActions.getLast();
+        try {
+            return opponentActions.getLast();
+        } catch (NoSuchElementException e) {
+            return null;
+        }
     }
 
     public Action getLastPlayerAction() {
-        return playerActions.getLast();
+        try {
+            return playerActions.getLast();
+        } catch (NoSuchElementException e) {
+            return null;
+        }
     }
 
     public boolean isFirstMove() {
