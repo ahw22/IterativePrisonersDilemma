@@ -103,25 +103,29 @@ public class ScoreChartPanel extends JPanel {
 
         mainPanel.add(chartPanel, BorderLayout.NORTH);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         buttonPanel.setBackground(SURFACE);
         buttonPanel.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(BORDER_COLOR),
                 "Click a strategy to view match details",
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
                 javax.swing.border.TitledBorder.DEFAULT_POSITION,
-                new Font("Monospaced", Font.PLAIN, 11),
+                new Font("Monospaced", Font.PLAIN, 14),
                 TEXT_MUTED
         ));
 
         for (Strategy strategy : ranking) {
             JButton btn = new JButton(strategy.getName());
-            btn.setFont(new Font("Monospaced", Font.PLAIN, 10));
+            btn.setFont(new Font("Monospaced", Font.PLAIN, 14));
             btn.setBackground(SURFACE);
             btn.setForeground(ACCENT);
             btn.setBorder(BorderFactory.createLineBorder(ACCENT));
             btn.setFocusPainted(false);
             btn.addActionListener(e -> onStrategySelected.accept(strategy));
+            btn.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(ACCENT),
+                    BorderFactory.createEmptyBorder(4, 8, 4, 8)
+            ));
             buttonPanel.add(btn);
         }
 

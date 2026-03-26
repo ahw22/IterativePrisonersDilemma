@@ -320,7 +320,7 @@ public class SwingGui extends JFrame {
         inner.add(modeLabel);
         inner.add(Box.createVerticalStrut(6));
 
-        String[] modes = {"Round Robin", "Ecological (Population)"};
+        String[] modes = {"Round Robin"};
         JComboBox<String> modeBox = new JComboBox<>(modes);
         modeBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
         modeBox.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -408,7 +408,7 @@ public class SwingGui extends JFrame {
         chartPlaceholder.setBorder(BorderFactory.createLineBorder(BORDER_COLOR));
         chartPlaceholder.setPreferredSize(new Dimension(0, 70));
         JLabel chartHint = new JLabel("[ Score Chart — run tournament to populate ]", SwingConstants.CENTER);
-        chartHint.setFont(new Font("Monospaced", Font.ITALIC, 10));
+        chartHint.setFont(new Font("Monospaced", Font.ITALIC, 14));
         chartHint.setForeground(TEXT_MUTED);
         chartPlaceholder.add(chartHint, BorderLayout.CENTER);
         south.add(chartPlaceholder);
@@ -546,7 +546,7 @@ public class SwingGui extends JFrame {
 
     private JButton accentButton(String text) {
         JButton btn = new JButton(text);
-        btn.setFont(new Font("Monospaced", Font.BOLD, 11));
+        btn.setFont(new Font("Monospaced", Font.BOLD, 14));
         btn.setBackground(ACCENT);
         btn.setForeground(new Color(0x0A1520));
         btn.setFocusPainted(false);
@@ -571,7 +571,7 @@ public class SwingGui extends JFrame {
 
     private JButton mutedButton(String text) {
         JButton btn = new JButton(text);
-        btn.setFont(new Font("Monospaced", Font.PLAIN, 11));
+        btn.setFont(new Font("Monospaced", Font.PLAIN, 14));
         btn.setBackground(SURFACE);
         btn.setForeground(TEXT_MUTED);
         btn.setFocusPainted(false);

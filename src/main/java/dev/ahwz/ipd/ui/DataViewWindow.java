@@ -45,7 +45,7 @@ public class DataViewWindow extends JFrame {
         add(header, BorderLayout.NORTH);
 
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane.setFont(new Font("Monospaced", Font.BOLD, 12));
+        tabbedPane.setFont(new Font("Monospaced", Font.BOLD, 14));
         tabbedPane.setBackground(SURFACE2);
         tabbedPane.setForeground(TEXT_MAIN);
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
