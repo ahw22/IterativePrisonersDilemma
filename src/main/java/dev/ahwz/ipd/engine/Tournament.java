@@ -29,24 +29,6 @@ public class Tournament {
         ranking = new ArrayList<>();
     }
 
-    public void run(PayoffMatrix matrix) {
-        for (Strategy sA : strategies) {
-            for (Strategy sB : strategies) {
-                Match match = new Match();
-                MatchResult result = match.play(sA, sB, rounds, matrix, noise);
-                matchResults.add(result);
-            }
-        }
-        calculateScores();
-
-        List<Strategy> desc = totalScores.entrySet().stream()
-                .sorted(Map.Entry.<Strategy, Double>comparingByValue().reversed())
-                .map(Map.Entry::getKey)
-                .toList();
-
-        ranking.addAll(desc);
-    }
-
     public void run(PayoffMatrix matrix, IntConsumer progressCallback) {
         int totalRounds = strategies.size() * strategies.size() * rounds;
         int completedRounds = 0;
