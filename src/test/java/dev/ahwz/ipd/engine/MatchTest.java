@@ -1,7 +1,7 @@
 package dev.ahwz.ipd.engine;
 
 import dev.ahwz.ipd.model.*;
-import dev.ahwz.ipd.strategies.AlwaysCooporate;
+import dev.ahwz.ipd.strategies.AlwaysCooperate;
 import dev.ahwz.ipd.strategies.AlwaysDefect;
 import dev.ahwz.ipd.strategies.TitForTat;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ class MatchTest {
 
     @Test
     void play_alwaysCooperateVsAlwaysDefect_correctScores() {
-        Strategy playerA = new AlwaysCooporate();
+        Strategy playerA = new AlwaysCooperate();
         Strategy playerB = new AlwaysDefect();
         
         MatchResult result = match.play(playerA, playerB, 100, matrix, 0.0);
@@ -28,8 +28,8 @@ class MatchTest {
 
     @Test
     void play_alwaysCooperateVsAlwaysCooperate_correctScores() {
-        Strategy playerA = new AlwaysCooporate();
-        Strategy playerB = new AlwaysCooporate();
+        Strategy playerA = new AlwaysCooperate();
+        Strategy playerB = new AlwaysCooperate();
         
         MatchResult result = match.play(playerA, playerB, 100, matrix, 0.0);
         
@@ -55,7 +55,7 @@ class MatchTest {
     @Test
     void play_titForTatVsAlwaysCooperate_highCooperation() {
         Strategy playerA = new TitForTat();
-        Strategy playerB = new AlwaysCooporate();
+        Strategy playerB = new AlwaysCooperate();
         
         MatchResult result = match.play(playerA, playerB, 100, matrix, 0.0);
         
@@ -78,7 +78,7 @@ class MatchTest {
 
     @Test
     void play_correctNumberOfRounds() {
-        Strategy playerA = new AlwaysCooporate();
+        Strategy playerA = new AlwaysCooperate();
         Strategy playerB = new AlwaysDefect();
         
         MatchResult result = match.play(playerA, playerB, 50, matrix, 0.0);
@@ -89,7 +89,7 @@ class MatchTest {
 
     @Test
     void play_returnsBothPlayers() {
-        Strategy playerA = new AlwaysCooporate();
+        Strategy playerA = new AlwaysCooperate();
         Strategy playerB = new AlwaysDefect();
         
         MatchResult result = match.play(playerA, playerB, 10, matrix, 0.0);
