@@ -4,15 +4,16 @@ import dev.ahwz.ipd.model.Strategy;
 import dev.ahwz.ipd.strategies.*;
 import lombok.NoArgsConstructor;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
 @NoArgsConstructor
 public final class StrategyRegistry {
 
-    private static final List<Strategy> STRATEGIES = Stream.concat(
+    private static final List<Strategy> STRATEGIES = Stream.of(
             List.of(
-                    new AlwaysCooporate(),
+                    new AlwaysCooperate(),
                     new AlwaysDefect(),
                     new GenerousTitForTat(),
                     new GradualTitForTat(),
@@ -21,9 +22,10 @@ public final class StrategyRegistry {
                     new SuspiciousTitForTat(),
                     new TitForTat(),
                     new TitForTwoTats()
-            ).stream(),
-            RandomStrategyFactory.createRandomStrategiesList().stream()
-    ).toList();
+            ),
+            RandomStrategyFactory.createRandomStrategiesList(),
+            SouthamptonFactory.createSouthamptonStrategy()          // just add a new line here
+    ).flatMap(Collection::stream).toList();
 
     public static List<Strategy> getStrategies() {
         return STRATEGIES;
