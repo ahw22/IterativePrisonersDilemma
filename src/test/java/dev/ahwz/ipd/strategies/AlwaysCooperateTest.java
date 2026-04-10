@@ -6,24 +6,24 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AlwaysCooporateTest {
+class AlwaysCooperateTest {
 
     @Test
     void getName_returnsCorrectName() {
-        AlwaysCooporate strategy = new AlwaysCooporate();
+        AlwaysCooperate strategy = new AlwaysCooperate();
         assertEquals("Always Cooperate", strategy.getName());
     }
 
     @Test
     void getAction_onEmptyHistory_returnsCooperate() {
-        AlwaysCooporate strategy = new AlwaysCooporate();
+        AlwaysCooperate strategy = new AlwaysCooperate();
         GameHistory history = new GameHistory(100);
         assertEquals(Action.COOPERATE, strategy.getAction(history));
     }
 
     @Test
     void getAction_afterMultipleRounds_alwaysReturnsCooperate() {
-        AlwaysCooporate strategy = new AlwaysCooporate();
+        AlwaysCooperate strategy = new AlwaysCooperate();
         GameHistory history = new GameHistory(100);
         
         for (int i = 0; i < 10; i++) {
