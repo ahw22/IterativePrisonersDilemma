@@ -4,7 +4,7 @@ import dev.ahwz.ipd.model.Action;
 import dev.ahwz.ipd.model.GameHistory;
 import dev.ahwz.ipd.model.Strategy;
 
-public class AlwaysCooporate implements Strategy {
+public class AlwaysCooperate implements Strategy {
 
     @Override
     public String getName() {
